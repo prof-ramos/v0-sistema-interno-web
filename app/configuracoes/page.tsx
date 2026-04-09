@@ -87,8 +87,8 @@ export default function ConfiguracoesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Configuracoes"
-        subtitle="Personalize sua experiencia no sistema"
+        title="Configurações"
+        subtitle="Personalize sua experiência no sistema"
         actions={
           <div className="flex gap-2">
             <Button 
@@ -167,7 +167,7 @@ export default function ConfiguracoesPage() {
 
         {/* Aparencia */}
         <SectionCard
-          title="Aparencia"
+          title="Aparência"
           description="Personalize a interface do sistema"
         >
           <div className="space-y-6">
@@ -178,7 +178,7 @@ export default function ConfiguracoesPage() {
               <div className="flex-1">
                 <p className="font-medium">Tema</p>
                 <p className="text-sm text-muted-foreground">
-                  Escolha entre claro, escuro ou automatico
+                  Escolha entre claro, escuro ou automático
                 </p>
               </div>
             </div>
@@ -229,10 +229,10 @@ export default function ConfiguracoesPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="email-notifications" className="text-base">
-                    Notificacoes por E-mail
+                    Notificações por E-mail
                   </Label>
                   <p className="text-sm text-muted-foreground">
-                    Receba atualizacoes importantes no seu e-mail
+                    Receba atualizações importantes no seu e-mail
                   </p>
                 </div>
                 <Switch
@@ -245,7 +245,7 @@ export default function ConfiguracoesPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="push-notifications" className="text-base">
-                    Notificacoes Push
+                    Notificações Push
                   </Label>
                   <p className="text-sm text-muted-foreground">
                     Receba alertas em tempo real no navegador
@@ -283,7 +283,7 @@ export default function ConfiguracoesPage() {
         open={resetDialogOpen}
         onOpenChange={setResetDialogOpen}
         title="Resetar Dados"
-        description="Tem certeza que deseja resetar todos os dados para o estado inicial? Isso ira restaurar os dados de exemplo e remover todas as alteracoes feitas. Esta acao nao pode ser desfeita."
+        description="Tem certeza que deseja resetar todos os dados para o estado inicial? Isso irá restaurar os dados de exemplo e remover todas as alterações feitas. Esta ação não pode ser desfeita."
         confirmLabel="Resetar"
         onConfirm={handleReset}
         variant="destructive"
@@ -291,3 +291,4 @@ export default function ConfiguracoesPage() {
     </div>
   )
 }
+

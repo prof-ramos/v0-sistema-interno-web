@@ -72,12 +72,16 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
         <Label 
           htmlFor={fieldId}
           className={cn(
-            'text-sm font-medium',
+            'text-sm font-medium text-foreground',
             error && 'text-destructive'
           )}
         >
           {label}
-          {required && <span className="text-destructive ml-1">*</span>}
+          {required && (
+            <span className="text-destructive ml-1" aria-hidden="true">
+              *
+            </span>
+          )}
         </Label>
 
         {props.type === 'textarea' ? (
@@ -91,6 +95,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             placeholder={props.placeholder}
             disabled={props.disabled}
             rows={props.rows ?? 4}
+            aria-required={required}
             aria-invalid={!!error}
             aria-describedby={error ? errorId : hint ? hintId : undefined}
             className={cn(
@@ -106,6 +111,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
           >
             <SelectTrigger
               id={fieldId}
+              aria-required={required}
               aria-invalid={!!error}
               aria-describedby={error ? errorId : hint ? hintId : undefined}
               className={cn(
@@ -137,6 +143,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             onBlur={props.onBlur}
             placeholder={props.placeholder}
             disabled={props.disabled}
+            aria-required={required}
             aria-invalid={!!error}
             aria-describedby={error ? errorId : hint ? hintId : undefined}
             className={cn(

@@ -100,7 +100,7 @@ export default function SolicitacoesPage() {
   const confirmDelete = useCallback(() => {
     if (itemToDelete) {
       deleteSolicitacao(itemToDelete)
-      toast.success('Solicitacao excluida com sucesso!')
+      toast.success('Solicitação excluída com sucesso!')
       setItemToDelete(null)
     }
   }, [itemToDelete, deleteSolicitacao])
@@ -108,7 +108,7 @@ export default function SolicitacoesPage() {
   const columns: Column<Solicitacao>[] = useMemo(() => [
     {
       key: 'titulo',
-      header: 'Titulo',
+      header: 'Título',
       sortable: true,
       render: (item) => (
         <div className="min-w-0">
@@ -178,12 +178,12 @@ export default function SolicitacoesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Solicitacoes"
-        subtitle="Gerencie solicitacoes e demandas"
+        title="Solicitações"
+        subtitle="Gerencie solicitações e demandas"
         actions={
-          <Button onClick={() => toast.info('Formulario de nova solicitacao em desenvolvimento')}>
+          <Button onClick={() => toast.info('Formulário de nova solicitação em desenvolvimento')}>
             <Plus className="mr-2 size-4" />
-            Nova Solicitacao
+            Nova Solicitação
           </Button>
         }
       />
@@ -197,7 +197,7 @@ export default function SolicitacoesPage() {
             filterValues={filters}
             onFilterChange={handleFilterChange}
             onClearFilters={handleClearFilters}
-            placeholder="Buscar por titulo, descricao ou solicitante..."
+            placeholder="Buscar por título, descrição ou solicitante..."
           />
 
           <DataTable
@@ -205,7 +205,7 @@ export default function SolicitacoesPage() {
             columns={columns}
             keyExtractor={(item) => item.id}
             onRowClick={handleView}
-            emptyMessage="Nenhuma solicitacao encontrada."
+            emptyMessage="Nenhuma solicitação encontrada."
           />
         </div>
       </SectionCard>
@@ -216,7 +216,7 @@ export default function SolicitacoesPage() {
           <DialogHeader>
             <DialogTitle>{selectedSolicitacao?.titulo}</DialogTitle>
             <DialogDescription>
-              Detalhes da solicitacao
+              Detalhes da solicitação
             </DialogDescription>
           </DialogHeader>
           
@@ -237,7 +237,7 @@ export default function SolicitacoesPage() {
                   <p>{selectedSolicitacao.solicitanteNome}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Descricao</p>
+                  <p className="font-medium text-muted-foreground">Descrição</p>
                   <p className="whitespace-pre-wrap">{selectedSolicitacao.descricao}</p>
                 </div>
                 {selectedSolicitacao.dataLimite && (
@@ -248,7 +248,7 @@ export default function SolicitacoesPage() {
                 )}
                 {selectedSolicitacao.responsavelNome && (
                   <div>
-                    <p className="font-medium text-muted-foreground">Responsavel</p>
+                    <p className="font-medium text-muted-foreground">Responsável</p>
                     <p>{selectedSolicitacao.responsavelNome}</p>
                   </div>
                 )}
@@ -266,8 +266,8 @@ export default function SolicitacoesPage() {
       <ConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title="Excluir Solicitacao"
-        description="Tem certeza que deseja excluir esta solicitacao? Esta acao nao pode ser desfeita."
+        title="Excluir Solicitação"
+        description="Tem certeza que deseja excluir esta solicitação? Esta ação não pode ser desfeita."
         confirmLabel="Excluir"
         onConfirm={confirmDelete}
         variant="destructive"

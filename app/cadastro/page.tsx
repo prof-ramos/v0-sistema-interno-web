@@ -150,7 +150,7 @@ export default function CadastroPage() {
   const confirmDelete = useCallback(() => {
     if (itemToDelete) {
       deleteCadastro(itemToDelete)
-      toast.success('Cadastro excluido com sucesso!')
+      toast.success('Cadastro excluído com sucesso!')
       if (selectedId === itemToDelete) {
         handleNewCadastro()
       }
@@ -189,7 +189,7 @@ export default function CadastroPage() {
           <SectionCard title="Dados do Cadastro">
             <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
               {/* Dados Principais */}
-              <FormSection title="Dados Principais" description="Informacoes basicas do cadastro">
+              <FormSection title="Dados Principais" description="Informações básicas do cadastro">
                 <FormField
                   type="text"
                   label="Nome Completo"
@@ -259,7 +259,7 @@ export default function CadastroPage() {
               <Separator />
 
               {/* Endereco */}
-              <FormSection title="Endereco" description="Informacoes de localizacao">
+              <FormSection title="Endereço" description="Informações de localização">
                 <FormField
                   type="text"
                   label="CEP"
@@ -353,10 +353,10 @@ export default function CadastroPage() {
               <Separator />
 
               {/* Observacoes */}
-              <FormSection title="Observacoes" description="Informacoes adicionais">
+              <FormSection title="Observações" description="Informações adicionais">
                 <FormField
                   type="textarea"
-                  label="Observacoes"
+                  label="Observações"
                   name="observacoes"
                   value={formData.observacoes || ''}
                   onChange={(v) => handleFieldChange('observacoes', v)}
@@ -389,7 +389,7 @@ export default function CadastroPage() {
                 <EmptyState
                   icon={User}
                   title="Nenhum cadastro"
-                  description="Crie seu primeiro cadastro usando o formulario ao lado."
+                  description="Crie seu primeiro cadastro usando o formulário ao lado."
                 />
               </div>
             ) : (
@@ -434,7 +434,7 @@ export default function CadastroPage() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         title="Excluir Cadastro"
-        description="Tem certeza que deseja excluir este cadastro? Esta acao nao pode ser desfeita."
+        description="Tem certeza que deseja excluir este cadastro? Esta ação não pode ser desfeita."
         confirmLabel="Excluir"
         onConfirm={confirmDelete}
         variant="destructive"
@@ -442,3 +442,4 @@ export default function CadastroPage() {
     </div>
   )
 }
+

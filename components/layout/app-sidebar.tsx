@@ -34,7 +34,7 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold">Sistema Interno</span>
-            <span className="text-xs text-muted-foreground">Gestao Integrada</span>
+            <span className="text-xs text-muted-foreground">Gestão Integrada</span>
           </div>
         </Link>
       </SidebarHeader>

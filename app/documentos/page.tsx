@@ -101,7 +101,7 @@ export default function DocumentosPage() {
   const confirmDelete = useCallback(() => {
     if (itemToDelete) {
       deleteDocumento(itemToDelete)
-      toast.success('Documento excluido com sucesso!')
+      toast.success('Documento excluído com sucesso!')
       setItemToDelete(null)
     }
   }, [itemToDelete, deleteDocumento])
@@ -109,7 +109,7 @@ export default function DocumentosPage() {
   const columns: Column<Documento>[] = useMemo(() => [
     {
       key: 'numero',
-      header: 'Numero',
+      header: 'Número',
       sortable: true,
       width: '120px',
       render: (item) => (
@@ -118,7 +118,7 @@ export default function DocumentosPage() {
     },
     {
       key: 'titulo',
-      header: 'Titulo',
+      header: 'Título',
       sortable: true,
       render: (item) => (
         <div className="min-w-0">
@@ -188,7 +188,7 @@ export default function DocumentosPage() {
     <div className="space-y-6">
       <PageHeader
         title="Documentos"
-        subtitle="Gerencie oficios, memorandos e outros documentos"
+        subtitle="Gerencie ofícios, memorandos e outros documentos"
         actions={
           <Button onClick={() => toast.info('Editor de documentos em desenvolvimento')}>
             <Plus className="mr-2 size-4" />
@@ -285,7 +285,7 @@ export default function DocumentosPage() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         title="Excluir Documento"
-        description="Tem certeza que deseja excluir este documento? Esta acao nao pode ser desfeita."
+        description="Tem certeza que deseja excluir este documento? Esta ação não pode ser desfeita."
         confirmLabel="Excluir"
         onConfirm={confirmDelete}
         variant="destructive"

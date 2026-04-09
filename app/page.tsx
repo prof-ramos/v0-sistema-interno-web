@@ -7,6 +7,7 @@ import {
   FileText, 
   FolderOpen, 
   TrendingUp,
+  TrendingDown,
   Plus,
   Clock,
   ArrowRight,
@@ -18,6 +19,20 @@ import { StatusBadge, PrioridadeBadge } from '@/components/feedback'
 import { useAppStore } from '@/store/use-app-store'
 import { ROUTES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
+
+const getTrendStyles = (change: string) => {
+  const isPositive = change.startsWith('+');
+  return {
+    isPositive,
+    colorClass: isPositive ? 'text-green-600' : 'text-red-600',
+    Icon: isPositive ? TrendingUp : TrendingDown,
+  };
+};
+
+const TrendIndicator = ({ change }: { change: string }) => {
+  const { colorClass, Icon } = getTrendStyles(change);
+  return <Icon className={cn('size-3', colorClass)} />;
+};
 
 export default function DashboardPage() {
   const { cadastros, solicitacoes, documentos } = useAppStore()
@@ -32,7 +47,7 @@ export default function DashboardPage() {
       change: '+12%',
     },
     {
-      label: 'Solicitacoes',
+      label: 'Solicitações',
       value: solicitacoes.length,
       icon: FileText,
       href: ROUTES.SOLICITACOES,
@@ -66,7 +81,7 @@ export default function DashboardPage() {
 
   const quickActions = [
     { label: 'Novo Cadastro', href: ROUTES.CADASTRO, icon: Users },
-    { label: 'Nova Solicitacao', href: ROUTES.SOLICITACOES, icon: FileText },
+    { label: 'Nova Solicitação', href: ROUTES.SOLICITACOES, icon: FileText },
     { label: 'Novo Documento', href: ROUTES.DOCUMENTOS, icon: FolderOpen },
   ]
 
@@ -74,13 +89,17 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <PageHeader
         title="Dashboard"
-        subtitle="Visao geral do sistema"
+        subtitle="Visão geral do sistema"
       />
 
       {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Link key={stat.label} href={stat.href}>
+          <Link 
+            key={stat.label} 
+            href={stat.href}
+            aria-label={`Ver ${stat.label}: ${stat.value}`}
+          >
             <Card className="transition-all hover:shadow-md hover:border-primary/20">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
@@ -93,16 +112,11 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="mt-2 flex items-center gap-1 text-xs">
-                  <TrendingUp className={cn(
-                    'size-3',
-                    stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                  )} />
-                  <span className={cn(
-                    stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                  )}>
+                  <TrendIndicator change={stat.change} />
+                  <span className={getTrendStyles(stat.change).colorClass}>
                     {stat.change}
                   </span>
-                  <span className="text-muted-foreground">vs mes anterior</span>
+                  <span className="text-muted-foreground">vs mês anterior</span>
                 </div>
               </CardContent>
             </Card>
@@ -113,12 +127,12 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Activity */}
         <SectionCard
-          title="Solicitacoes Recentes"
-          description="Ultimas solicitacoes registradas"
+          title="Solicitações Recentes"
+          description="Últimas solicitações registradas"
           className="lg:col-span-2"
           actions={
             <Button variant="ghost" size="sm" asChild>
-              <Link href={ROUTES.SOLICITACOES}>
+              <Link href={ROUTES.SOLICITACOES} aria-label="Ver todas as solicitações">
                 Ver todas
                 <ArrowRight className="ml-1 size-4" />
               </Link>
@@ -127,7 +141,7 @@ export default function DashboardPage() {
         >
           {recentSolicitacoes.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">
-              Nenhuma solicitacao encontrada.
+              Nenhuma solicitação encontrada.
             </p>
           ) : (
             <div className="space-y-3">
@@ -156,8 +170,8 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <SectionCard
-          title="Acoes Rapidas"
-          description="Atalhos para operacoes comuns"
+          title="Ações Rápidas"
+          description="Atalhos para operações comuns"
         >
           <div className="space-y-2">
             {quickActions.map((action) => (
@@ -167,7 +181,19 @@ export default function DashboardPage() {
                 className="w-full justify-start"
                 asChild
               >
-                <Link href={action.href}>
+                <Link href={action.href} aria-label={`Realizar ${action.label}`}>
+                  <Plus className="mr-2 size-4" />
+                  {action.label}
+                </Link>
+              </Button>
+            ))}
+          </div>
+        </SectionCard>
+      </div>
+    </div>
+  )
+}
+ef={action.href} aria-label={`Realizar ${action.label}`}>
                   <Plus className="mr-2 size-4" />
                   {action.label}
                 </Link>

@@ -360,7 +360,7 @@ export default function CadastroPage() {
                   name="observacoes"
                   value={formData.observacoes || ''}
                   onChange={(v) => handleFieldChange('observacoes', v)}
-                  placeholder="Digite observacoes adicionais..."
+                  placeholder="Digite observações adicionais..."
                   rows={3}
                   className="sm:col-span-2"
                 />

@@ -206,7 +206,7 @@ export default function ConfiguracoesPage() {
 
         {/* Notificacoes */}
         <SectionCard
-          title="Notificacoes"
+          title="Notificações"
           description="Configure como deseja receber alertas"
           className="lg:col-span-2"
         >
@@ -216,7 +216,7 @@ export default function ConfiguracoesPage() {
                 <Bell className="size-5 text-accent-foreground" />
               </div>
               <div>
-                <p className="font-medium">Preferencias de Notificacao</p>
+                <p className="font-medium">Preferências de Notificação</p>
                 <p className="text-sm text-muted-foreground">
                   Escolha como deseja ser notificado
                 </p>
@@ -261,7 +261,7 @@ export default function ConfiguracoesPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="sms-notifications" className="text-base">
-                    Notificacoes por SMS
+                    Notificações por SMS
                   </Label>
                   <p className="text-sm text-muted-foreground">
                     Receba mensagens de texto para alertas urgentes

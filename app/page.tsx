@@ -193,15 +193,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-ef={action.href} aria-label={`Realizar ${action.label}`}>
-                  <Plus className="mr-2 size-4" />
-                  {action.label}
-                </Link>
-              </Button>
-            ))}
-          </div>
-        </SectionCard>
-      </div>
-    </div>
-  )
-}

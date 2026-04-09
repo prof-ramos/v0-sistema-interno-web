@@ -152,6 +152,7 @@ export default function SolicitacoesPage() {
             variant="ghost"
             size="icon"
             className="size-8"
+            aria-label="Visualizar"
             onClick={(e) => {
               e.stopPropagation()
               handleView(item)
@@ -163,6 +164,7 @@ export default function SolicitacoesPage() {
             variant="ghost"
             size="icon"
             className="size-8 text-muted-foreground hover:text-destructive"
+            aria-label="Excluir"
             onClick={(e) => {
               e.stopPropagation()
               handleDelete(item.id)

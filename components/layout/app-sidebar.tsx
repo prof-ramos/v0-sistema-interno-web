@@ -29,12 +29,12 @@ export function AppSidebar() {
           href="/" 
           className="flex items-center gap-3 px-2 py-1.5 transition-colors hover:text-primary"
         >
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Building2 className="size-4" />
+          <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Building2 className="size-5" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="text-sm font-semibold">Sistema Interno</span>
-            <span className="text-xs text-muted-foreground">Gestão Integrada</span>
+            <span className="text-base font-semibold">Sistema Interno</span>
+            <span className="text-sm text-muted-foreground">Gestão Integrada</span>
           </div>
         </Link>
       </SidebarHeader>
@@ -56,10 +56,10 @@ export function AppSidebar() {
                     >
                       <Link href={item.href}>
                         <Icon className={cn(
-                          'size-4',
+                          'size-5',
                           isActive && 'text-primary'
                         )} />
-                        <span>{item.label}</span>
+                        <span className="text-base">{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

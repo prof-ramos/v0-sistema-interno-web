@@ -103,10 +103,7 @@ export interface AppState {
   solicitacoes: Solicitacao[]
   documentos: Documento[]
   configuracoes: ConfiguracoesApp
-  
-  // UI State
-  sidebarCollapsed: boolean
-  
+
   // Rascunhos (para auto-save)
   rascunhos: {
     cadastro?: Partial<CadastroForm>
@@ -133,6 +130,7 @@ export interface Column<T> {
   key: keyof T | string
   header: string
   render?: (item: T) => React.ReactNode
+  sortableValue?: (item: T) => string | number | Date | null | undefined
   sortable?: boolean
   width?: string
 }

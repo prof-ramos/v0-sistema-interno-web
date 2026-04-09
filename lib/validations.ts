@@ -39,7 +39,10 @@ export const email = (message = 'E-mail invalido'): ValidationRule => ({
 export const cpf = (message = 'CPF invalido'): ValidationRule => ({
   validate: (value) => {
     if (!value || typeof value !== 'string') return false
-    const cpfClean = value.replace(/\D/g, '')
+    const cpfValue = value.trim()
+    if (!/^[\d.\-\s]+$/.test(cpfValue)) return false
+
+    const cpfClean = cpfValue.replace(/\D/g, '')
     if (cpfClean.length !== 11) return false
     
     // Validação básica de CPF
@@ -67,7 +70,10 @@ export const cpf = (message = 'CPF invalido'): ValidationRule => ({
 export const cnpj = (message = 'CNPJ invalido'): ValidationRule => ({
   validate: (value) => {
     if (!value || typeof value !== 'string') return false
-    const cnpjClean = value.replace(/\D/g, '')
+    const cnpjValue = value.trim()
+    if (!/^[\d./\-\s]+$/.test(cnpjValue)) return false
+
+    const cnpjClean = cnpjValue.replace(/\D/g, '')
     if (cnpjClean.length !== 14) return false
     
     // Validação básica de CNPJ
@@ -96,7 +102,10 @@ export const cnpj = (message = 'CNPJ invalido'): ValidationRule => ({
 export const cpfOrCnpj = (message = 'CPF ou CNPJ invalido'): ValidationRule => ({
   validate: (value) => {
     if (!value || typeof value !== 'string') return false
-    const clean = value.replace(/\D/g, '')
+    const documentValue = value.trim()
+    if (!/^[\d./\-\s]+$/.test(documentValue)) return false
+
+    const clean = documentValue.replace(/\D/g, '')
     if (clean.length === 11) return cpf().validate(value)
     if (clean.length === 14) return cnpj().validate(value)
     return false

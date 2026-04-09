@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { Plus, Save, Trash2, Sparkles, User } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader, SectionCard } from '@/components/layout'
@@ -60,7 +60,12 @@ export default function CadastroPage() {
     if (rascunhos.cadastro && !selectedId) {
       setFormData({ ...initialFormData, ...rascunhos.cadastro })
     }
-  }, [])
+  }, [rascunhos.cadastro, selectedId])
+
+  const hasUnsavedDraftChanges = useMemo(
+    () => formData !== initialFormData && formData !== rascunhos.cadastro,
+    [formData, rascunhos.cadastro]
+  )
 
   // Auto-save draft
   useAutoSave(
@@ -71,17 +76,19 @@ export default function CadastroPage() {
       }
     },
     1500,
-    !selectedId && JSON.stringify(formData) !== JSON.stringify(initialFormData)
+    !selectedId && hasUnsavedDraftChanges
   )
 
   const handleFieldChange = useCallback((field: keyof CadastroForm, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     if (touched[field]) {
-      validateField(field, value)
+      if (field in cadastroValidationRules) {
+        validateField(field as keyof typeof cadastroValidationRules, value)
+      }
     }
   }, [touched, validateField])
 
-  const handleFieldBlur = useCallback((field: keyof CadastroForm) => {
+  const handleFieldBlur = useCallback((field: keyof typeof cadastroValidationRules) => {
     setTouched(field)
     validateField(field, formData[field])
   }, [formData, setTouched, validateField])
@@ -187,7 +194,7 @@ export default function CadastroPage() {
         {/* Form */}
         <div className="lg:col-span-2 space-y-6">
           <SectionCard title="Dados do Cadastro">
-            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
+            <form noValidate onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
               {/* Dados Principais */}
               <FormSection title="Dados Principais" description="Informações básicas do cadastro">
                 <FormField
@@ -413,7 +420,7 @@ export default function CadastroPage() {
                           variant="ghost"
                           size="icon"
                           className="size-8 text-muted-foreground hover:text-destructive"
-                          onClick={(e) => {
+                          onClick={(e: React.MouseEvent) => {
                             e.stopPropagation()
                             handleDelete(cadastro.id)
                           }}
@@ -442,4 +449,3 @@ export default function CadastroPage() {
     </div>
   )
 }
-

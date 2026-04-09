@@ -11,11 +11,11 @@ import type {
   ConfiguracoesApp 
 } from '@/lib/types'
 import { 
-  MOCK_CADASTROS, 
-  MOCK_SOLICITACOES, 
+  DEFAULT_CONFIGURACOES,
+  MOCK_CADASTROS,
   MOCK_DOCUMENTOS,
-  DEFAULT_CONFIGURACOES 
-} from '@/lib/constants'
+  MOCK_SOLICITACOES,
+} from '@/lib/mock-data'
 
 // Gerar ID único
 function generateId(): string {
@@ -45,11 +45,7 @@ interface AppStore extends AppState {
   
   // Configurações
   updateConfiguracoes: (data: Partial<ConfiguracoesApp>) => void
-  
-  // UI
-  toggleSidebar: () => void
-  setSidebarCollapsed: (collapsed: boolean) => void
-  
+
   // Rascunhos
   saveRascunhoCadastro: (data: Partial<CadastroForm>) => void
   clearRascunhoCadastro: () => void
@@ -67,7 +63,6 @@ const initialState: AppState = {
   solicitacoes: MOCK_SOLICITACOES,
   documentos: MOCK_DOCUMENTOS,
   configuracoes: DEFAULT_CONFIGURACOES,
-  sidebarCollapsed: false,
   rascunhos: {},
 }
 
@@ -175,18 +170,7 @@ export const useAppStore = create<AppStore>()(
           },
         }))
       },
-      
-      // ===== UI =====
-      toggleSidebar: () => {
-        set((state) => ({
-          sidebarCollapsed: !state.sidebarCollapsed,
-        }))
-      },
-      
-      setSidebarCollapsed: (collapsed) => {
-        set({ sidebarCollapsed: collapsed })
-      },
-      
+
       // ===== RASCUNHOS =====
       saveRascunhoCadastro: (data) => {
         set((state) => ({
@@ -247,5 +231,4 @@ export const useCadastros = () => useAppStore((state) => state.cadastros)
 export const useSolicitacoes = () => useAppStore((state) => state.solicitacoes)
 export const useDocumentos = () => useAppStore((state) => state.documentos)
 export const useConfiguracoes = () => useAppStore((state) => state.configuracoes)
-export const useSidebarCollapsed = () => useAppStore((state) => state.sidebarCollapsed)
 export const useRascunhos = () => useAppStore((state) => state.rascunhos)

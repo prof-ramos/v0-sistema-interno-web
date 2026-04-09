@@ -56,7 +56,7 @@ export function FiltersBar({
           value={filterValues[filter.key] || ''}
           onValueChange={(value) => onFilterChange?.(filter.key, value)}
         >
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger aria-label={filter.label} className="w-[160px]">
             <SelectValue placeholder={filter.label} />
           </SelectTrigger>
           <SelectContent>

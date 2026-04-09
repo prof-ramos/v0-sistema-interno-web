@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
-import { DM_Sans, Source_Serif_4 } from 'next/font/google'
-import { ThemeProvider } from 'next-themes'
+import { DM_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { AppShell } from '@/components/layout'
 import './globals.css'
@@ -11,10 +11,6 @@ const dmSans = DM_Sans({
   variable: '--font-sans',
 })
 
-const sourceSerif = Source_Serif_4({
-  subsets: ['latin'],
-  variable: '--font-serif',
-})
 
 export const metadata: Metadata = {
   title: 'Sistema Interno | Gestao Integrada',
@@ -55,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${dmSans.variable} ${sourceSerif.variable} font-sans antialiased`}>
+      <body className={`${dmSans.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

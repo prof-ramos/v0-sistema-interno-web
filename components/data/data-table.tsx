@@ -27,7 +27,15 @@ interface DataTableProps<T> {
 
 type SortDirection = 'asc' | 'desc' | null
 
-export function DataTable<T>({
+function getColumnValue<T extends object>(item: T, key: keyof T | string): unknown {
+  if (typeof key !== 'string' || !(key in item)) {
+    return undefined
+  }
+
+  return item[key as keyof T]
+}
+
+export function DataTable<T extends object>({
   data,
   columns,
   keyExtractor,
@@ -55,10 +63,11 @@ export function DataTable<T>({
 
   const sortedData = useMemo(() => {
     if (!sortKey || !sortDirection) return data
+    const sortColumn = columns.find((item) => String(item.key) === sortKey)
 
     return [...data].sort((a, b) => {
-      const aValue = (a as Record<string, unknown>)[sortKey]
-      const bValue = (b as Record<string, unknown>)[sortKey]
+      const aValue = sortColumn?.sortableValue ? sortColumn.sortableValue(a) : getColumnValue(a, sortKey)
+      const bValue = sortColumn?.sortableValue ? sortColumn.sortableValue(b) : getColumnValue(b, sortKey)
 
       if (aValue === bValue) return 0
       if (aValue === null || aValue === undefined) return 1
@@ -71,7 +80,7 @@ export function DataTable<T>({
 
       return sortDirection === 'asc' ? comparison : -comparison
     })
-  }, [data, sortKey, sortDirection])
+  }, [columns, data, sortKey, sortDirection])
 
   const getSortIcon = (key: string) => {
     if (sortKey !== key) {
@@ -161,7 +170,7 @@ export function DataTable<T>({
                 <TableCell key={String(column.key)}>
                   {column.render
                     ? column.render(item)
-                    : String((item as Record<string, unknown>)[column.key as string] ?? '-')}
+                    : String(getColumnValue(item, column.key) ?? '-')}
                 </TableCell>
               ))}
             </TableRow>

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import { FormField } from './components/forms/form-field'
+import { FormField } from '../components/forms/form-field'
 
 export function TestComponent() {
   const inputRef = useRef<HTMLInputElement>(null)

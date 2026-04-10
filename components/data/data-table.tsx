@@ -73,10 +73,22 @@ export function DataTable<T extends object>({
       if (aValue === null || aValue === undefined) return 1
       if (bValue === null || bValue === undefined) return -1
 
-      const comparison = String(aValue).localeCompare(String(bValue), 'pt-BR', {
-        numeric: true,
-        sensitivity: 'base',
-      })
+      let comparison: number
+      if (aValue instanceof Date && bValue instanceof Date) {
+        comparison = aValue.getTime() - bValue.getTime()
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+        const aFinite = Number.isFinite(aValue)
+        const bFinite = Number.isFinite(bValue)
+        if (!aFinite && !bFinite) comparison = 0
+        else if (!aFinite) comparison = 1
+        else if (!bFinite) comparison = -1
+        else comparison = aValue - bValue
+      } else {
+        comparison = String(aValue).localeCompare(String(bValue), 'pt-BR', {
+          numeric: true,
+          sensitivity: 'base',
+        })
+      }
 
       return sortDirection === 'asc' ? comparison : -comparison
     })

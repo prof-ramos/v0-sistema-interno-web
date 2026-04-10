@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ErrorAlert } from '@/components/feedback'
+import { reportError } from '@/lib/error-reporting'
 
 interface GlobalErrorProps {
   error: Error & { digest?: string }
@@ -14,7 +15,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
   const router = useRouter()
 
   useEffect(() => {
-    console.error(error)
+    reportError(error, { component: 'GlobalError' })
   }, [error])
 
   return (

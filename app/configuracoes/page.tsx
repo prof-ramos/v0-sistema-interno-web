@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/store/use-app-store'
 import { useAutoSave } from '@/hooks/use-debounce'
+import { isDeepEqual } from '@/lib/utils'
 import type { ConfiguracoesApp } from '@/lib/types'
 
 export default function ConfiguracoesPage() {
@@ -24,9 +25,9 @@ export default function ConfiguracoesPage() {
   const [perfil, setPerfil] = useState(configuracoes.perfil)
   const [notificacoes, setNotificacoes] = useState(configuracoes.notificacoes)
 
-  const isPerfilDirty = useMemo(() => perfil !== configuracoes.perfil, [perfil, configuracoes.perfil])
+  const isPerfilDirty = useMemo(() => !isDeepEqual(perfil, configuracoes.perfil), [perfil, configuracoes.perfil])
   const isNotificacoesDirty = useMemo(
-    () => notificacoes !== configuracoes.notificacoes,
+    () => !isDeepEqual(notificacoes, configuracoes.notificacoes),
     [notificacoes, configuracoes.notificacoes]
   )
 

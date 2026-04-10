@@ -62,7 +62,7 @@ Utilize os comandos abaixo para gerenciar o ciclo de vida do projeto:
   - Aplique atributos ARIA obrigatórios (`role`, `aria-labelledby`, `aria-describedby`).
   - Siga padrões de navegação por teclado (`tabindex`, `focus-visible`, ordem de foco).
   - Mantenha contraste de cores mínimo (WCAG AA/AAA).
-  - Formulários devem utilizar `<label>` vinculada por `for`/`id` ou `aria-label`.
+  - Formulários devem utilizar `<label>` vinculada por `htmlFor`/`id` em JSX (equivalente ao atributo HTML `for`) ou `aria-label`.
   - Mensagens de erro de validação (Zod) devem ser acessíveis e focáveis para leitores de tela.
 - **Tratamento de Erros:**
   - API/Serviços: Trate chamadas em try/catch, parse os erros mapeando para a interface `ErrorResult`.
@@ -74,7 +74,7 @@ Utilize os comandos abaixo para gerenciar o ciclo de vida do projeto:
 ## Fluxos de Trabalho Implementados
 
 1. **Auto-Save:** O sistema possui um mecanismo de rascunho automático (com `debounce` ex: 1000ms a 5000ms) em formulários de cadastro e ações contínuas para evitar perda de dados.
-2. **Persistência:** *(Atenção: Apenas Dev-Mode)* Dados simulados e alterações do usuário são persistidos temporariamente no `localStorage` via Zustand `persist` middleware. Em produção, remova PII (dados sensíveis) do cliente e migre para backend com banco de dados e APIs autenticadas ou storage local criptografado e explicitamente consentido.
+2. **Persistência:** Dados simulados e alterações do usuário são atualmente persistidos no `localStorage` via Zustand `persist` middleware com `partialize` **em todos os ambientes**. **Risco aceito (MVP):** campos PII (nome, cpfCnpj, email, telefone, endereço em `cadastros`; perfil em `configuracoes`) permanecem no cliente durante a fase de protótipo. **Plano de migração:** ao implementar o backend (Prisma + PostgreSQL), remover slices PII do `partialize`, migrar para APIs autenticadas, e usar SQLite para testes locais em desenvolvimento. Os campos PII estão marcados com `⚠ PII` no `partialize` do store para referência.
 3. **Feedback:** Ações irreversíveis (ex: Excluir) devem invocar um `<ConfirmDialog>`. Mensagens rápidas e fluxos não bloqueantes (ex: Sucesso ao salvar) utilizam `sonner` toasts categorizadas por severidade (success, error, warning).
 
 ## Configuração de Ambiente

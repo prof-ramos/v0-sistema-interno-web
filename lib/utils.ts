@@ -5,10 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function isDeepEqual(obj1: any, obj2: any): boolean {
+export function isDeepEqual(obj1: unknown, obj2: unknown): boolean {
   const visited = new WeakMap<object, WeakSet<object>>()
 
-  function deepEqual(a: any, b: any): boolean {
+  function deepEqual(a: unknown, b: unknown): boolean {
     if (a === b) return true
 
     if (typeof a === 'number' && typeof b === 'number' && Number.isNaN(a) && Number.isNaN(b)) {
@@ -59,7 +59,7 @@ export function isDeepEqual(obj1: any, obj2: any): boolean {
       if (viewA.length !== viewB.length) return false
       for (let i = 0; i < viewA.length; i++) {
         if (viewA[i] !== viewB[i]) {
-          // Handle NaN in typed arrays
+          // NaN check: no-op for Uint8Array, but kept for generic TypedArray path (Float32/64Array)
           if (Number.isNaN(viewA[i]) && Number.isNaN(viewB[i])) continue
           return false
         }
@@ -143,9 +143,11 @@ export function isDeepEqual(obj1: any, obj2: any): boolean {
     if (keys1.length !== keys2.length) return false
 
     // Objects must have same keys (including non-enumerable and symbols)
-    const set2 = new Set<any>(keys2)
+    const set2 = new Set<string | symbol>(keys2)
+    const objA = a as Record<string | symbol, unknown>
+    const objB = b as Record<string | symbol, unknown>
     for (const key of keys1) {
-      if (!set2.has(key) || !deepEqual(a[key], b[key])) {
+      if (!set2.has(key) || !deepEqual(objA[key], objB[key])) {
         return false
       }
     }

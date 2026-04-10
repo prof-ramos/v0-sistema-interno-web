@@ -106,8 +106,8 @@ export const cpfOrCnpj = (message = 'CPF ou CNPJ invalido'): ValidationRule => (
     if (!/^[\d./\-\s]+$/.test(documentValue)) return false
 
     const clean = documentValue.replace(/\D/g, '')
-    if (clean.length === 11) return cpf().validate(value)
-    if (clean.length === 14) return cnpj().validate(value)
+    if (clean.length === 11) return cpf().validate(clean)
+    if (clean.length === 14) return cnpj().validate(clean)
     return false
   },
   message,

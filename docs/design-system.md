@@ -10,7 +10,7 @@ Abaixo está o detalhamento do Design System completo, estruturado para seguir a
 
 | Token | Valor | Uso |
 | --- | --- | --- |
-| `--space-1` | `4px` | Ajuste fino: gap entre ícone e label, padding interno de badges |
+| `--space-1` | `calc(var(--space-unit) * 0.5)` (4px) | Ajuste fino: gap entre ícone e label, padding interno de badges |
 | `--space-2` | `8px` | Padding interno de chips/tags, gap mínimo entre elementos |
 | `--space-3` | `16px` | Padding de inputs, gap padrão entre itens de lista, margens mobile |
 | `--space-4` | `24px` | Padding de cards, gap entre seções internas |
@@ -44,20 +44,22 @@ Base: `1rem = 16px`, ratio `1.250`.
 
 ### 1.3 — Cores (Paleta Semântica)
 
-| Token | Hex | Uso |
+| Token | OKLCH | Uso |
 | --- | --- | --- |
-| `--color-background` | `#f8fafc` | Fundo da página |
-| `--color-surface` | `#ffffff` | Fundo de cards, sidebar |
-| `--color-foreground` | `#495565` | Texto principal |
-| `--color-muted` | `#6b7380` | Texto secundário, metadata |
-| `--color-primary` | `#040920` | Texto H1, botões primários |
-| `--color-primary-fg` | `#ffffff` | Texto sobre primary |
-| `--color-accent` | `#82b4d6` | Links, bordas de foco, ícones ativos |
-| `--color-border` | `#e5e7ec` | Bordas de cards, separadores, inputs |
-| `--color-success` | `#2f9f3d` | Status: Aprovada, Finalizado, Ativo |
-| `--color-warning` | `#c09000` | Status: Pendente, Em Análise |
-| `--color-destructive` | `#e40017` | Status: Urgente, ações destrutivas |
-| `--color-info` | `#3c7ebe` | Status: Enviado, informativos |
+| `--color-background` | `oklch(0.984 0.003 247)` | Fundo da página |
+| `--color-surface` | `oklch(1 0 0)` | Fundo de cards, sidebar |
+| `--color-foreground` | `oklch(0.446 0.03 256)` | Texto principal |
+| `--color-muted` | `oklch(0.554 0.022 257)` | Texto secundário, metadata |
+| `--color-primary` | `oklch(0.122 0.034 265)` | Texto H1, botões primários |
+| `--color-primary-fg` | `oklch(1 0 0)` | Texto sobre primary |
+| `--color-accent` | `oklch(0.737 0.08 236)` | Links, bordas de foco, ícones ativos |
+| `--color-border` | `oklch(0.929 0.006 264)` | Bordas de cards, separadores, inputs |
+| `--color-success` | `oklch(0.45 0.15 145)` | Status: Aprovada, Finalizado, Ativo |
+| `--color-warning` | `oklch(0.68 0.16 85)` | Status: Pendente, Em Análise |
+| `--color-destructive` | `oklch(0.577 0.245 27)` | Status: Urgente, ações destrutivas |
+| `--color-info` | `oklch(0.42 0.12 250)` | Status: Enviado, informativos |
+
+> **Nota:** O formato canônico de cor é OKLCH. Todas as definições estão centralizadas em `app/globals.css`.
 
 ### 1.4 — Breakpoints e Grid
 
@@ -333,8 +335,8 @@ body {
   background-color: var(--color-background);
 }
 
-/* Accessibility: Focus styles for all interactive elements */
-:focus-visible {
+/* Accessibility: Focus styles for interactive elements only */
+:is(a, button, input, textarea, select, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-offset);
   border-radius: var(--radius-sm);

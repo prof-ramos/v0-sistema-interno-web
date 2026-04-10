@@ -34,7 +34,6 @@ export class DocumentosPage extends BasePage {
 
   async search(text: string) {
     await this.searchInput.fill(text)
-    await this.page.waitForTimeout(500)
   }
 
   private async selectFilter(filterLocator: Locator, option: string) {
@@ -58,8 +57,17 @@ export class DocumentosPage extends BasePage {
     return this.dataTable.getByRole('row').filter({ hasText: text })
   }
 
+  private async getRowOrThrow(text: string): Promise<import('@playwright/test').Locator> {
+    const rows = this.findRowByText(text)
+    const count = await rows.count()
+    if (count === 0) {
+      throw new Error(`No row found for text: "${text}"`)
+    }
+    return rows.first()
+  }
+
   async viewRowByText(text: string) {
-    const row = this.findRowByText(text).first()
+    const row = await this.getRowOrThrow(text)
     await row.getByRole('button', { name: 'Visualizar' }).click()
   }
 
@@ -68,7 +76,7 @@ export class DocumentosPage extends BasePage {
   }
 
   async deleteRowByText(text: string) {
-    const row = this.findRowByText(text).first()
+    const row = await this.getRowOrThrow(text)
     await row.getByRole('button', { name: 'Excluir' }).click()
   }
 

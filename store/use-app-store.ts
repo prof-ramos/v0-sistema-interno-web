@@ -216,9 +216,13 @@ export const useAppStore = create<AppStore>()(
     {
       name: 'sistema-interno-storage',
       partialize: (state) => ({
+        // ⚠ PII: nome, cpfCnpj, email, telefone, endereço — migrar para backend antes de produção
         cadastros: state.cadastros,
+        // ⚠ PII: solicitanteNome, responsavelNome — migrar para backend antes de produção
         solicitacoes: state.solicitacoes,
+        // Contém destinatário/remetente — avaliar sensibilidade
         documentos: state.documentos,
+        // ⚠ PII: perfil.nome, perfil.email — migrar para backend antes de produção
         configuracoes: state.configuracoes,
         rascunhos: state.rascunhos,
       }),

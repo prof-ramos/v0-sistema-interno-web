@@ -22,7 +22,6 @@ export interface MotionTarget {
   scale?: number
   rotate?: number | string
   opacity?: number
-  [key: string]: any // Fallback for other valid motion properties
 }
 
 export interface AnimationDefinition {
@@ -47,7 +46,7 @@ export const EASINGS: Record<'elegant' | 'easeOut' | 'easeIn' | 'linear', Easing
 export const TRANSITIONS: Record<'elegant' | 'fast', Transition> = {
   /**
    * Elegant transition (800ms).
-   * Intentional longer duration to reflect the solemnity and institucional weight of ASOF.
+   * Intentional longer duration to reflect the solemnity and institutional weight of ASOF.
    */
   elegant: {
     duration: DURATIONS.elegant,

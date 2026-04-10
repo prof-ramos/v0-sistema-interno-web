@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Plus, Save, Trash2, Sparkles, User } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader, SectionCard } from '@/components/layout'
@@ -56,10 +56,12 @@ export default function CadastroPage() {
     rules: cadastroValidationRules,
   })
 
-  // Load draft on mount
+  // Load draft on mount (once only)
+  const hydratedRef = useRef(false)
   useEffect(() => {
-    if (rascunhos.cadastro && !selectedId) {
+    if (rascunhos.cadastro && !selectedId && !hydratedRef.current) {
       setFormData({ ...initialFormData, ...rascunhos.cadastro })
+      hydratedRef.current = true
     }
   }, [rascunhos.cadastro, selectedId])
 

@@ -74,7 +74,7 @@ export default function DashboardPage() {
       icon: Clock,
       href: ROUTES.SOLICITACOES,
       color: 'text-amber-700 bg-amber-50 dark:bg-amber-900/20 border-amber-200',
-      detail: `${solicitacoes.filter((item) => item.prioridade === 'urgente').length} urgentes`,
+      detail: `${solicitacoes.filter((item) => item.status === 'pendente' && item.prioridade === 'urgente').length} urgentes`,
     },
   ], [cadastros, solicitacoes, documentos])
 

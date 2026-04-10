@@ -126,7 +126,7 @@ e padrões já existentes na codebase, sem propor alterações.
 
 ## Referências na codebase
 
-- Tokens e cores: `tailwind.config.ts`
+- Tokens e cores (fonte de verdade): `app/globals.css`
 - Sistema de design: `docs/design-system.md`
 - Brand kit consolidado: `brandkit-asof.md`
 - Motion e timings: `app/globals.css`, `lib/motion-config.ts`, `lib/motion-variants.ts`

@@ -2,13 +2,19 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-function normalizeDataSnapshot(value: unknown): string {
+function normalizeDataSnapshot(value: unknown, visited = new WeakSet<object>()): string {
   if (value === null || typeof value !== 'object') {
     return JSON.stringify(value)
   }
 
+  // Guard against circular references
+  if (visited.has(value as object)) {
+    return '"[Circular]"'
+  }
+  visited.add(value as object)
+
   if (Array.isArray(value)) {
-    return `[${value.map((item) => normalizeDataSnapshot(item)).join(',')}]`
+    return `[${value.map((item) => normalizeDataSnapshot(item, visited)).join(',')}]`
   }
 
   const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) =>
@@ -16,7 +22,7 @@ function normalizeDataSnapshot(value: unknown): string {
   )
 
   return `{${entries
-    .map(([key, entryValue]) => `${JSON.stringify(key)}:${normalizeDataSnapshot(entryValue)}`)
+    .map(([key, entryValue]) => `${JSON.stringify(key)}:${normalizeDataSnapshot(entryValue, visited)}`)
     .join(',')}}`
 }
 
@@ -50,14 +56,20 @@ type DebouncedArgs = unknown[]
  */
 export function useDebouncedCallback<Args extends DebouncedArgs>(
   callback: (...args: Args) => void | Promise<void>,
-  delay: number
+  delay: number,
+  onError?: (err: unknown) => void
 ): (...args: Args) => void {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const callbackRef = useRef(callback)
+  const onErrorRef = useRef(onError)
   
   useEffect(() => {
     callbackRef.current = callback
   }, [callback])
+  
+  useEffect(() => {
+    onErrorRef.current = onError
+  }, [onError])
   
   const debouncedCallback = useCallback(
     (...args: Args) => {
@@ -66,7 +78,10 @@ export function useDebouncedCallback<Args extends DebouncedArgs>(
       }
       
       timeoutRef.current = setTimeout(() => {
-        void callbackRef.current(...args)
+        Promise.resolve(callbackRef.current(...args)).catch((err) => {
+          console.error('[useDebouncedCallback] Unhandled rejection:', err)
+          onErrorRef.current?.(err)
+        })
       }, delay)
     },
     [delay]
@@ -94,18 +109,25 @@ export function useAutoSave<T>(
 ) {
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [saveError, setSaveError] = useState<unknown>(null)
   const previousSnapshotRef = useRef(createDataSnapshot(data))
   const currentSnapshot = useMemo(() => createDataSnapshot(data), [data])
   
+  const handleSaveError = useCallback((err: unknown) => {
+    setSaveError(err)
+    setIsSaving(false)
+  }, [])
+
   const debouncedSave = useDebouncedCallback(async (newData: T, snapshot: string) => {
     try {
+      setSaveError(null)
       await onSave(newData)
       previousSnapshotRef.current = snapshot
       setLastSaved(new Date())
     } finally {
       setIsSaving(false)
     }
-  }, delay)
+  }, delay, handleSaveError)
   
   useEffect(() => {
     if (!enabled) {
@@ -125,5 +147,6 @@ export function useAutoSave<T>(
   return {
     isSaving,
     lastSaved,
+    saveError,
   }
 }

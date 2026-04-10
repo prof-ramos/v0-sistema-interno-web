@@ -12,14 +12,18 @@ test.describe('Configurações', () => {
     await expect(darkButton).toBeVisible()
 
     const html = page.locator('html')
+    const toastLocator = page.locator('[data-sonner-toast]')
 
     await darkButton.click()
-    await expect(page.locator('[data-sonner-toast]').getByText('Tema alterado com sucesso!')).toBeVisible()
+    await expect(toastLocator.getByText('Tema alterado com sucesso!')).toBeVisible()
     await expect(html).toHaveClass(/\bdark\b/)
+
+    // Wait for previous toast to disappear before triggering the next one
+    await toastLocator.waitFor({ state: 'hidden' })
 
     const lightButton = page.getByRole('button', { name: 'Claro' })
     await lightButton.click()
-    await expect(page.locator('[data-sonner-toast]').getByText('Tema alterado com sucesso!')).toBeVisible()
+    await expect(toastLocator.getByText('Tema alterado com sucesso!')).toBeVisible()
     await expect(html).not.toHaveClass(/dark/)
   })
 

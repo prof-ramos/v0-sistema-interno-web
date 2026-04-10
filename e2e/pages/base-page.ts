@@ -38,7 +38,11 @@ export class BasePage {
    * @returns {Promise<void>}
    */
   async navigateTo(label: string) {
-    const links = this.page.getByRole('link', { name: label })
+    const trimmed = label?.trim()
+    if (!trimmed) {
+      throw new Error(`Invalid label: "${label}" must be a non-empty string.`)
+    }
+    const links = this.page.getByRole('link', { name: trimmed })
     const count = await links.count()
     if (count === 0) {
       throw new Error(`No link found with name "${label}".`)
@@ -69,7 +73,8 @@ export class BasePage {
    * @returns {Locator} The Playwright locator for the toast.
    */
   getToast(text: string): Locator {
-    return this.page.locator('[data-sonner-toast]').filter({ hasText: text }).first()
+    const t = text.trim()
+    return this.page.locator('[data-sonner-toast][data-visible="true"]').filter({ hasText: t }).first()
   }
 
   /**

@@ -23,7 +23,7 @@ const quickActions = [
   { label: 'Novo Cadastro', href: ROUTES.CADASTRO, icon: Users },
   { label: 'Nova Solicitação', href: ROUTES.SOLICITACOES, icon: FileText },
   { label: 'Novo Documento', href: ROUTES.DOCUMENTOS, icon: FolderOpen },
-]
+] as const
 
 function subscribeToStoreHydration(callback: () => void) {
   const unsubscribeHydrate = useAppStore.persist.onHydrate(callback)
@@ -49,7 +49,7 @@ export default function DashboardPage() {
       value: cadastros.length,
       icon: Users,
       href: ROUTES.CADASTRO,
-      color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400',
+      color: 'text-primary bg-primary/10 border-primary/20',
       detail: `${cadastros.filter((item) => item.status === 'ativo').length} ativos`,
     },
     {
@@ -57,7 +57,7 @@ export default function DashboardPage() {
       value: solicitacoes.length,
       icon: FileText,
       href: ROUTES.SOLICITACOES,
-      color: 'text-violet-600 bg-violet-100 dark:bg-violet-900/30 dark:text-violet-400',
+      color: 'text-primary bg-primary/10 border-primary/20',
       detail: `${solicitacoes.filter((item) => item.status === 'concluida').length} concluídas`,
     },
     {
@@ -65,7 +65,7 @@ export default function DashboardPage() {
       value: documentos.length,
       icon: FolderOpen,
       href: ROUTES.DOCUMENTOS,
-      color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400',
+      color: 'text-primary bg-primary/10 border-primary/20',
       detail: `${documentos.filter((item) => item.status === 'finalizado').length} finalizados`,
     },
     {
@@ -73,7 +73,7 @@ export default function DashboardPage() {
       value: solicitacoes.filter((s: Solicitacao) => s.status === 'pendente').length,
       icon: Clock,
       href: ROUTES.SOLICITACOES,
-      color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400',
+      color: 'text-amber-700 bg-amber-50 dark:bg-amber-900/20 border-amber-200',
       detail: `${solicitacoes.filter((item) => item.prioridade === 'urgente').length} urgentes`,
     },
   ], [cadastros, solicitacoes, documentos])
@@ -93,10 +93,10 @@ export default function DashboardPage() {
       />
 
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {!mounted ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[132px] w-full rounded-xl" />
+            <Skeleton key={i} className="h-[132px] w-full rounded-sm" />
           ))
         ) : (
           stats.map((stat) => (
@@ -105,14 +105,14 @@ export default function DashboardPage() {
               href={stat.href}
               aria-label={`Ver ${stat.label}: ${stat.value}`}
             >
-              <Card className="transition-all hover:shadow-md hover:border-primary/20">
+              <Card className="transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-lg hover:-translate-y-2 hover:border-primary/20 rounded-sm">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <p className="text-base text-muted-foreground">{stat.label}</p>
-                      <p className="text-3xl font-semibold">{stat.value}</p>
+                      <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+                      <p className="text-4xl font-serif font-bold">{stat.value}</p>
                     </div>
-                    <div className={cn('rounded-lg p-2.5', stat.color)}>
+                    <div className={cn('rounded-sm p-2 bg-slate-50 border border-slate-200/50', stat.color)}>
                       <stat.icon className="size-6" />
                     </div>
                   </div>
@@ -126,7 +126,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-8 lg:grid-cols-3">
         {/* Recent Activity */}
         <SectionCard
           title="Solicitações Recentes"
@@ -156,10 +156,10 @@ export default function DashboardPage() {
               {recentSolicitacoes.map((solicitacao) => (
                 <div
                   key={solicitacao.id}
-                  className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/50"
+                  className="flex items-center justify-between rounded-sm border p-4 transition-colors hover:bg-muted/50"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-base">
+                    <p className="truncate font-serif font-bold text-lg">
                       {solicitacao.titulo}
                     </p>
                     <p className="text-sm text-muted-foreground mt-0.5">

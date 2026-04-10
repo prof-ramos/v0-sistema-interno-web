@@ -122,7 +122,7 @@ export default function DocumentosPage() {
       sortable: true,
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate font-medium">{item.titulo}</p>
+          <p className="truncate font-serif font-bold">{item.titulo}</p>
           <p className="truncate text-xs text-muted-foreground">{item.assunto}</p>
         </div>
       ),
@@ -161,7 +161,7 @@ export default function DocumentosPage() {
             variant="ghost"
             size="icon"
             className="size-8"
-            aria-label="Visualizar"
+            aria-label={`Visualizar documento: ${item.numero} - ${item.titulo}`}
             onClick={(e) => {
               e.stopPropagation()
               handleView(item)
@@ -173,7 +173,7 @@ export default function DocumentosPage() {
             variant="ghost"
             size="icon"
             className="size-8 text-muted-foreground hover:text-destructive"
-            aria-label="Excluir"
+            aria-label={`Excluir documento: ${item.numero} - ${item.titulo}`}
             onClick={(e) => {
               e.stopPropagation()
               handleDelete(item.id)
@@ -187,7 +187,7 @@ export default function DocumentosPage() {
   ], [handleView, handleDelete])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <PageHeader
         title="Documentos"
         subtitle="Gerencie ofícios, memorandos e outros documentos"

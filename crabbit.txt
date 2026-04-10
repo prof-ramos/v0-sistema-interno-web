@@ -1,0 +1,451 @@
+╔═════════════════════════════════════════════╗
+║                                             ║
+║           New update available!             ║
+║          Run: coderabbit update             ║
+║                                             ║
+╚═════════════════════════════════════════════╝
+
+Starting CodeRabbit review in plain text mode...
+
+Connecting to review service
+Setting up
+Summarizing
+Reviewing
+
+============================================================================
+File: components/forms/form-field.tsx
+Line: 61 to 62
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/forms/form-field.tsx around lines 61 - 62, O componente FormField perdeu o suporte a ref (breaking change): restaure o uso de React.forwardRef para que FormField aceite um ref compatível com consumidores imperativos; change the function signature back to a forwardRef wrapper (keeping FormFieldProps) and thread the forwarded ref into the correct DOM element used for focus/validation (e.g., the underlying input or the wrapper div), ensure the ref type matches (HTMLInputElement or HTMLDivElement as appropriate) and keep prop destructuring (label, name, error, required, hint, className) intact so existing callers using ref continue to work.
+
+============================================================================
+File: repomix-output.xml
+Line: 1 to 40
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @repomix-output.xml around lines 1 - 40, The XML is not well-formed because it contains multiple top-level nodes and stray text before a single root; fix by wrapping the entire current contents (including , , and all  entries) inside one root element (e.g.,  or ) and remove any leading/trailing free text outside elements, ensure only one root element remains, and run an XML validator to confirm well-formedness; update any code that reads the file to expect the chosen root element name.
+
+============================================================================
+File: e2e/solicitacoes.spec.ts
+Line: 77 to 86
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/solicitacoes.spec.ts around lines 77 - 86, The delete test should wait for the success toast to disappear to avoid flakiness for subsequent tests; after calling pageObj.confirmDelete() and asserting getToast('Solicitação excluída com sucesso!') is visible, add logic to wait for that toast to be hidden or dismissed (use pageObj.getToast(...).toBeHidden()/not.toBeVisible() or a pageObj.dismissToast()/waitForToastHidden helper) so the toast is cleaned up before the test ends.
+
+============================================================================
+File: e2e/pages/cadastro-page.ts
+Line: 5 to 16
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/pages/cadastro-page.ts around lines 5 - 16, A interface CadastroFormData não está exportada; exporte-a adicionando a palavra-chave export à declaração (export interface CadastroFormData) para que consommateurs do módulo possam tipar o parâmetro usado pelo método público fillForm da classe; verifique referências a CadastroFormData em outros módulos/imports e ajuste importações onde necessário.
+
+============================================================================
+File: app/error.tsx
+Line: 12 to 15
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/error.tsx around lines 12 - 15, The component exported as GlobalError in error.tsx conflicts with Next.js App Router conventions: if this is intended as the root-level global error handler, move the component to global-error.tsx (or rename the file) and ensure the component (GlobalError) returns the required  and  elements; if it is not the root handler, rename the component to e.g. RootError or AppError to avoid confusion. Replace the dev-only console.error call inside the useEffect in GlobalError (or the renamed component) with a production error tracker call (Sentry/Datadog) and keep console.error only behind a development check, ensuring you still accept the same props (GlobalErrorProps, { error, reset }) and call reset appropriately.
+
+============================================================================
+File: eslint.config.mjs
+Line: 1
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @eslint.config.mjs at line 1, The import of defineConfig and globalIgnores from 'eslint/config' is incorrect; verify whether you intended the flat config format or the @eslint/js helper and fix the import accordingly: either remove the named import and export a flat-config array (no defineConfig/globalIgnores) or change the source to '@eslint/js' (or the correct helper package) if you really need defineConfig/globalIgnores; update usages of defineConfig and globalIgnores in the file to match the chosen format and ensure the module you import actually exports those symbols.
+
+============================================================================
+File: e2e/solicitacoes.spec.ts
+Line: 59 to 68
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/solicitacoes.spec.ts around lines 59 - 68, The test "should clear filters" currently only calls pageObj.search('Férias') before calling pageObj.clearFilters() but then asserts status and prioridade are reset; update the test to make it robust by applying multiple filters first (e.g., call pageObj.search('Férias') plus methods to set Status and Prioridade filters via pageObj (e.g., pageObj.setStatusFilter(...) and pageObj.setPrioridadeFilter(...) or interact with pageObj.statusFilter/pageObj.prioridadeFilter to select values), assert those filters are active, then call pageObj.clearFilters() and verify pageObj.searchInput is empty and pageObj.statusFilter and pageObj.prioridadeFilter contain the default texts; keep using the same test name and existing selectors (pageObj.search, pageObj.clearFilters, pageObj.searchInput, pageObj.statusFilter, pageObj.prioridadeFilter).
+
+============================================================================
+File: tests/autosave.test.ts
+Line: 6 to 18
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @tests/autosave.test.ts around lines 6 - 18, Add edge-case unit tests for createDataSnapshot: cover null vs undefined vs empty object, empty objects and empty arrays, arrays with same elements vs elements in different order, deeply nested structures, circular references (assert behavior — either throws a specific error or returns a stable representation), and special numeric values (NaN, Infinity, -0) to ensure snapshot stability; add tests named like "handles null and undefined", "handles arrays and order", "handles deeply nested objects", "handles circular references", and "handles special numeric values" in the same test suite where createDataSnapshot is used so failures pin to the correct behavior.
+
+============================================================================
+File: e2e/dashboard.spec.ts
+Line: 8 to 15
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/dashboard.spec.ts around lines 8 - 15, The summary-card assertions in the test "should render the dashboard and summary cards" are fragile because they use page.getByLabel with a regex and don't wait for async data; replace those label-based checks with stable selectors (prefer page.getByTestId or page.getByRole) by adding test ids like summary-cadastros, summary-solicitacoes, summary-documentos in the UI and updating the test to use page.getByTestId('summary-cadastros') / getByTestId('summary-solicitacoes') / getByTestId('summary-documentos') (or the appropriate getByRole) and add an explicit wait for the summary API or use Playwright's built-in expect on the locator (e.g., expect(summaryLocator).toHaveText(/Ver .*: \d+/)) which will auto-wait so the numbers load before asserting; keep the existing heading check page.getByRole('heading', { name: 'Dashboard' }) intact.
+
+============================================================================
+File: app/page.tsx
+Line: 21 to 25
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/page.tsx around lines 21 - 25, The quickActions array is declared as a plain const and should be made a readonly literal tuple to preserve exact string/icon literal types; update the quickActions declaration (symbol: quickActions) to append "as const" so TypeScript infers literal types for label/href/icon and prevents widening, ensuring downstream consumers get precise types for ROUTES and icon components.
+
+============================================================================
+File: app/page.tsx
+Line: 3 to 19
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/page.tsx around lines 3 - 19, The file uses cn() on line 104 but never imports it; add the missing import for the helper (e.g. import { cn } from '@/lib/utils') at the top of app/page.tsx so the cn symbol is defined when used in the component; ensure you use the correct named import matching where your project exports the utility.
+
+============================================================================
+File: e2e/pages/documentos-page.ts
+Line: 29 to 35
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/pages/documentos-page.ts around lines 29 - 35, The async methods goto and search currently rely on inferred return types; explicitly annotate both with : Promise (e.g., async goto(): Promise and async search(text: string): Promise) so the intent is clear and TypeScript signatures are explicit for these methods in the class; update the method declarations for goto and search accordingly.
+
+============================================================================
+File: e2e/pages/cadastro-page.ts
+Line: 62 to 63
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/pages/cadastro-page.ts around lines 62 - 63, The UF selection currently clicks the combobox but risks partial matches when choosing the option; update the selection logic in cadastro-page.ts so after awaiting this.ufCombobox.click() you locate the option by its visible name using an exact match (e.g., use a locator/getByRole/getByText call with the option name data.uf and exact: true) and then click that option; reference this.ufCombobox and data.uf to find where to add the exact: true selector.
+
+============================================================================
+File: e2e/pages/cadastro-page.ts
+Line: 70 to 73
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/pages/cadastro-page.ts around lines 70 - 73, O método expectFormCleared() atualmente verifica apenas o campo nomeInput, deixando 8 campos sem validação; atualize expectFormCleared() para assertar que todos os campos do formulário (ex.: nomeInput, emailInput, telefoneInput, enderecoInput, cidadeInput, estadoSelect, cepInput, complementoInput, dataNascimentoInput, senhaInput — ou os nomes reais usados no arquivo) tenham valor vazio ou estado padrão, ou alternativamente documente claramente no comentário do método que a verificação é intencionalmente parcial; localize a função expectFormCleared() e adicione as expectativas restantes usando toHaveValue('')/toBeEmpty() ou asserts equivalentes para os elementos correspondentes.
+
+============================================================================
+File: app/error.tsx
+Line: 26 to 28
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/error.tsx around lines 26 - 28, Replace the full-page reload caused by window.location.assign('/') with Next.js client routing: mark the component as a client component if not already, import useRouter from 'next/navigation' and call const router = useRouter(), then change the Button onClick handler to call router.replace('/') (or router.push('/') if you want a history entry) so navigation uses the Next router and preserves client-side state (auth, React Query cache). Update the component to reference useRouter and router.replace in place of window.location.assign inside the Button's onClick.
+
+============================================================================
+File: e2e/pages/documentos-page.ts
+Line: 37 to 45
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/pages/documentos-page.ts around lines 37 - 45, Os métodos filterByTipo e filterByStatus estão duplicados; extraia um método auxiliar privado (por exemplo clickAndSelectFilter or applyFilter) que receba o locator do filtro (tipoFilter / statusFilter) e o valor a selecionar, e faça o click no filtro e depois this.page.getByRole('option', { name: value }).click(); altere filterByTipo e filterByStatus para chamar esse helper, preservando nomes existentes para localizar facilmente filterByTipo, filterByStatus, tipoFilter, statusFilter e this.page.getByRole.
+
+============================================================================
+File: app/configuracoes/page.tsx
+Line: 27 to 31
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/configuracoes/page.tsx around lines 27 - 31, The current useMemo checks (isPerfilDirty and isNotificacoesDirty) compare objects by reference (perfil !== configuracoes.perfil), which yields false negatives/positives when the store creates new object references; change these to deep-equality checks (e.g., use lodash.isEqual or fast-deep-equal or fallback to JSON.stringify) so you compare value equality between perfil and configuracoes.perfil and between notificacoes and configuracoes.notificacoes; keep the same dependency array but replace the comparator in the memo callbacks (update the logic in isPerfilDirty and isNotificacoesDirty) to use the chosen deepEqual function.
+
+============================================================================
+File: package.json
+Line: 10
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @package.json at line 10, The npm script "test:unit" currently uses the experimental flag --experimental-strip-types and an unquoted glob; update the "test:unit" script to remove the --experimental-strip-types flag (so it relies on Node >=22.18 default behavior) and wrap the glob pattern in quotes (e.g., "tests//*.test.ts") to ensure shell compatibility; if your tests use TypeScript features not supported by strip-types (e.g., namespace or enum) switch to a proper TypeScript test runner/transpile step (ts-node/jest/tsc) instead of relying on strip-types.
+
+============================================================================
+File: e2e/cadastro.spec.ts
+Line: 28 to 30
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/cadastro.spec.ts around lines 28 - 30, O teste está chamando pageObj.clearState() tanto em beforeEach quanto em afterEach, o que é redundante para isolamento; remova o bloco test.afterEach(async () => { await pageObj.clearState() }) a menos que haja um efeito colateral externo que exija limpeza pós-teste, caso em que documente esse motivo e mantenha a chamada; verifique as funções/métodos pageObj.clearState e o hook beforeEach para confirmar que a limpeza pré-teste cobre o cenário esperado.
+
+============================================================================
+File: e2e/pages/solicitacoes-page.ts
+Line: 55 to 63
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/pages/solicitacoes-page.ts around lines 55 - 63, The helpers viewRowByText and deleteRowByText currently call findRowByText(text).first(), which silently acts on the first match and can operate on the wrong row if duplicates exist; change these methods to assert uniqueness before acting: use findRowByText(text).count() (or equivalent) to throw a clear error if count !== 1, or require callers/tests to pass a unique identifier (e.g., unique text or ID) into findRowByText so the selector matches exactly one row, then perform the getByRole(...).click() on that single confirmed row.
+
+============================================================================
+File: e2e/pages/solicitacoes-page.ts
+Line: 1 to 27
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/pages/solicitacoes-page.ts around lines 1 - 27, The viewDialog locator uses page.getByRole('dialog').filter({ hasText: 'Detalhes da solicitação' }) which can match unintended elements; update the locator to use page.getByRole('dialog', { name: 'Detalhes da solicitação' }) in the SolicitacoesPage constructor (viewDialog) so it targets the dialog by its accessible name, and if the dialog component currently lacks an accessible name add/ensure an appropriate aria-label/aria-labelledby that reads "Detalhes da solicitação" so the test can use the { name: ... } selector reliably.
+
+============================================================================
+File: tests/validations.test.ts
+Line: 14 to 29
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @tests/validations.test.ts around lines 14 - 29, Add unit tests to cover the new whitelist validation behavior: in tests/validations.test.ts add cases that assert cpf().validate and cnpj().validate return false for inputs containing letters or other invalid symbols (e.g., '529.982.247-25a', 'abc.def.ghi-jk', '45.723.174/0001-10a') and add tests that inputs with leading/trailing whitespace are trimmed and accepted/rejected appropriately (e.g., '  529.982.247-25  ' should validate true for cpf()). Reference the existing test blocks for cpf() and cnpj() to insert these new test functions so the whitelist and trim behavior are covered.
+
+============================================================================
+File: e2e/pages/documentos-page.ts
+Line: 26
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/pages/documentos-page.ts at line 26, O locator viewDialog está usando page.getByRole('dialog').filter({ hasText: 'Visualizacao do documento' }) que é frágil; em vez disso, change o locator para usar a opção name do getByRole (por exemplo usar page.getByRole('dialog', { name: 'Visualizacao do documento' })) ou, se o diálogo tiver aria-label/um título acessível, referenciar esse nome acessível; atualize qualquer uso de viewDialog para apontar para o novo locator e verifique que o texto acessível (aria-label/aria-labelledby) corresponde ao nome fornecido.
+
+============================================================================
+File: e2e/configuracoes.spec.ts
+Line: 8 to 14
+Type: nitpick
+
+
+============================================================================
+File: components/data/data-table.tsx
+Line: 68 to 70
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/data/data-table.tsx around lines 68 - 70, The sort callback is repeatedly calling columns.find(...) (via computing sortColumn) for every comparison which is inefficient; move the lookup out of the sort and cache the result before calling data.sort: compute const sortColumn = columns.find(c => c.key === sortKey) (or similar) once, then inside Array.prototype.sort use that cached sortColumn and the existing getColumnValue(a, sortKey) / getColumnValue(b, sortKey) logic; update references to sortColumn, sortKey, getColumnValue and the sort() call so the expensive columns.find is no longer executed per comparison.
+
+============================================================================
+File: e2e/configuracoes.spec.ts
+Line: 16 to 19
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/configuracoes.spec.ts around lines 16 - 19, The test "should save new notifications settings" currently only clicks the "Salvar Tudo" button and checks the toast; update it to actually change a notification control (e.g., toggle or checkbox element for notifications) before calling page.getByRole('button', { name: 'Salvar Tudo' }).click(), then reload or navigate away and back and assert the same notification control remains in the changed state to verify persistence; keep the toast assertion (locator '[data-sonner-toast]') but also add a post-reload assertion for the specific notification input you modified, and if you decide not to modify any control, rename the test description to reflect that it's only verifying the save-toast behavior.
+
+============================================================================
+File: lib/validations.ts
+Line: 105 to 111
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @lib/validations.ts around lines 105 - 111, The code trims input into documentValue and uses it for the whitelist check but inconsistently passes the original value into cpf().validate and cnpj().validate; update the calls in the validations function to pass documentValue (or the cleaned numeric string where appropriate) instead of value so the trimmed input is consistently used—specifically change cpf().validate(value) and cnpj().validate(value) to use documentValue (or clean when numeric-only validation is required) while keeping existing length checks on clean.
+
+============================================================================
+File: app/cadastro/page.tsx
+Line: 65 to 68
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/cadastro/page.tsx around lines 65 - 68, The current useMemo for hasUnsavedDraftChanges uses reference comparison (formData !== initialFormData && formData !== rascunhos.cadastro) which will be true after any setFormData; replace it with a value-based comparison (e.g., use a deep-equality helper like lodash/isEqual or a JSON.stringify comparison) comparing formData to initialFormData and rascunhos.cadastro, and ensure the memo dependency array includes initialFormData and rascunhos.cadastro; update the symbol referenced (hasUnsavedDraftChanges / useMemo / formData / initialFormData / rascunhos.cadastro) accordingly so autosave only triggers when the actual form content differs.
+
+============================================================================
+File: e2e/documentos.spec.ts
+Line: 71 to 80
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/documentos.spec.ts around lines 71 - 80, The toast assertion is fragile: update the test 'should delete document with confirmation' to wait for the toast reliably and avoid hardcoded text by using a stable check from the Page Object; call pageObj.getToast(...) with a visibility wait that includes an explicit timeout (e.g., toBeVisible({ timeout: ... })) or use a Page Object helper like pageObj.waitForToast() that returns the toast element, and replace the hardcoded message string with a shared constant (e.g., DELETED_DOCUMENT_TOAST or pageObj.TOAST_MESSAGES.deleted) when asserting content after visibility. Ensure you still call pageObj.deleteRowByText('OF-001/2024') and pageObj.confirmDelete() before awaiting the toast.
+
+============================================================================
+File: e2e/documentos.spec.ts
+Line: 15 to 21
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/documentos.spec.ts around lines 15 - 21, The test hardcodes the subtitle string causing fragility; replace the direct text lookup in the test (the pageObj.page.getByText call) by using a Page Object accessor similar to pageObj.heading and pageObj.novoDocumentoButton — add a subtitle getter on DocumentosPage (e.g., get subtitle() { ... } that returns this.page.getByTestId('documentos-subtitle') or equivalent) and change the test to await expect(pageObj.subtitle).toBeVisible(); ensure the app adds the data-testid 'documentos-subtitle' to the subtitle element if missing.
+
+============================================================================
+File: hooks/use-debounce.ts
+Line: 97 to 98
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @hooks/use-debounce.ts around lines 97 - 98, The useMemo for currentSnapshot relies on the object identity of data, so if a consumer mutates the same object in place the memo won’t update; add a clear comment/documentation by the currentSnapshot/useMemo and/or createDataSnapshot explaining this limitation and recommending callers either provide immutable/new objects, or that we can switch to a mutation-safe dependency (e.g., derive dependencies from a stable serialization like JSON.stringify(data) or from createDataSnapshot(data) output) or enforce a deep copy when creating snapshots; reference previousSnapshotRef, currentSnapshot, createDataSnapshot and useMemo so the maintainer can locate and apply the doc or alternative change.
+
+============================================================================
+File: e2e/documentos.spec.ts
+Line: 53 to 62
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/documentos.spec.ts around lines 53 - 62, The test 'should clear filters' currently checks the clear filters button is visible before clearing and validates inputs/reset state after calling pageObj.clearFilters(); add one more assertion to verify the button disappears afterwards (e.g., assert pageObj.clearFiltersButton is not visible or is hidden) so the test validates both appearance and disappearance of the clear button after invoking pageObj.clearFilters().
+
+============================================================================
+File: hooks/use-debounce.ts
+Line: 5 to 21
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @hooks/use-debounce.ts around lines 5 - 21, The recursive function normalizeDataSnapshot lacks protection against circular references, which causes stack overflows for self-referential objects; fix it by introducing a visited WeakSet (or an extra helper parameter) that tracks object identities during recursion, check visited.has(value) before recursing and return a stable marker like "[Circular]" (or a consistent JSON-safe representation) when a cycle is detected, and ensure you add objects to visited before recursing and remove them (or rely on WeakSet) afterwards so normalizeDataSnapshot preserves deterministic ordering while avoiding infinite recursion.
+
+============================================================================
+File: e2e/cadastro.spec.ts
+Line: 18
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/cadastro.spec.ts at line 18, Remova a chamada redundante test.describe.configure({ mode: 'default' }) do teste (a configuração padrão do Playwright já é mode: 'default'); localize a invocação do método test.describe.configure no arquivo e exclua essa linha para limpar o código sem alterar comportamento.
+
+============================================================================
+File: gemini.md
+Line: 1 to 61
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @gemini.md around lines 1 - 61, The GEMINI.md is missing essential operational sections (env vars, API/backend, DB, security, deploy, monitoring); update gemini.md by appending clear sections titled "## Configuração de Ambiente", "## Arquitetura Backend", "## Banco de Dados", "## Segurança", "## Deploy e CI/CD" and "## Monitoramento" that enumerate required environment variables (e.g., DATABASE_URL, NEXTAUTH_SECRET, API_URL), describe API endpoints/auth strategy and rate limiting, document DB schema/migrations/backup strategy, list auth/authorization and XSS/CSRF/SQL injection mitigations and server-side Zod validation, and outline deployment pipeline, environments and monitoring/logging tools so developers can configure and operate the system from the repo.
+
+============================================================================
+File: hooks/use-debounce.ts
+Line: 110 to 115
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @hooks/use-debounce.ts around lines 110 - 115, Ao detectar enabled === false dentro do useEffect você não deve forçar setIsSaving(false) enquanto um save ainda está em andamento; adicione/consume uma flag de controle (por exemplo isSavingRef or saveInFlight boolean usado por startSave/finishSave) ou use um AbortController para cancelar o save pendente, e só então limpar o estado de salvamento; preserve a atribuição previousSnapshotRef.current = currentSnapshot, mas antes de chamar setIsSaving(false) verifique isSavingRef.current (ou cancele a operação e aguarde a conclusão/callback) para evitar marcar como "não salvando" quando há uma operação em voo; atualize as funções que iniciam e finalizam o save (os handlers que usam setIsSaving) para manter essa flag consistente.
+
+============================================================================
+File: e2e/cadastro.spec.ts
+Line: 32 to 38
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/cadastro.spec.ts around lines 32 - 38, O teste "should create a complete user" só verifica pageObj.expectFormCleared() e precisa também confirmar o feedback de sucesso; atualize o teste que usa pageObj.fillForm(validCadastro), pageObj.submit() e pageObj.expectFormCleared() para incluir uma asserção que valide explicitamente o toast/alerta de sucesso (ex.: pageObj.expectSuccessToast('Usuário criado') ou método equivalente) ou outra verificação de criação (consulta UI/API que confirme o novo usuário), garantindo que o cadastro foi realmente criado antes de assumir que o formulário foi limpo.
+
+============================================================================
+File: hooks/use-debounce.ts
+Line: 100 to 108
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @hooks/use-debounce.ts around lines 100 - 108, The debouncedSave callback swallows failures — modify the hook signature to accept an optional onError callback and update the debouncedSave implementation (the async callback passed to useDebouncedCallback) to wrap await onSave(newData) in a try/catch: on success update previousSnapshotRef.current and setLastSaved, on failure call onError(error) (or another consumer-provided error handler) and do not update previousSnapshotRef/setLastSaved; keep setIsSaving(false) in the finally block so saving state is cleared. Ensure you reference debouncedSave, useDebouncedCallback, onSave, previousSnapshotRef, setLastSaved and setIsSaving when making the changes so the consumer can react to save errors.
+
+============================================================================
+File: e2e/documentos.spec.ts
+Line: 23 to 32
+Type: nitpick
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @e2e/documentos.spec.ts around lines 23 - 32, O teste "should search documents by text" usa o número mágico 2 para representar "1 header + 1 resultado"; crie uma constante (por exemplo HEADER_ROW_COUNT = 1) ou um helper (ex: expectedRowsFor(dataRows) => HEADER_ROW_COUNT + dataRows) e substitua as ocorrências onde pageObj.dataTable.getByRole('row') é comparado a 2, usando HEADER_ROW_COUNT + 1 para o primeiro assert, HEADER_ROW_COUNT + SEED_ROW_COUNT para o segundo e HEADER_ROW_COUNT + 1 para o terceiro; atualize a referência no bloco do teste para usar essa constante/helper em vez do literal 2 para melhorar clareza e evitar números mágicos.
+
+============================================================================
+File: lib/mock-data.ts
+Line: 3 to 57
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @lib/mock-data.ts around lines 3 - 57, The MOCK_CADASTROS array contains realistic personal data (CPF/CNPJ, emails, phones, addresses, CEPs, and hard-coded 2024 timestamps); replace those with clearly fictitious values and non-routable/fake domains and postal codes (e.g., CPFs like "000.000.000-00" or repeated-digit placeholders, emails like "usuario@exemplo.test", phones as "0000-0000", addresses like "Rua Exemplo" / "Avenida Teste", CEP "00000-000") and swap the hard-coded criadoEm/atualizadoEm strings for generated or relative timestamps; update entries inside MOCK_CADASTROS to use these non-sensitive placeholders to comply with privacy rules.
+
+============================================================================
+File: gemini.md
+Line: 57 to 61
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @gemini.md around lines 57 - 61, A estratégia atual persiste tudo no localStorage via Zustand — isso é inseguro, volátil e sem sincronização; change the persistence model so localStorage is only used for ephemeral drafts and client-side cache, implement server-side persistence via API endpoints and a proper database (refer to the current usage of localStorage and the Zustand store), ensure sensitive fields (CPF/CNPJ/personal data) are never stored unencrypted on the client and are submitted over TLS to the backend, add sync logic in the store to reconcile local drafts with the server (conflict resolution/merge), and introduce backup/redundancy and explicit user export/import features for recovery.
+
+============================================================================
+File: gemini.md
+Line: 19 to 33
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @gemini.md around lines 19 - 33, Add a new "Estratégia de Testes" section after the "Arquitetura e Estrutura de Pastas" section describing the test folder and tools: mention the test folder pattern (__tests__/ or *.test.ts), the testing frameworks to use (e.g., Jest + React Testing Library for unit/component tests and Playwright/Cypress for E2E), and minimal coverage/targets (e.g., 80% for critical modules like components in components/ (forms, feedback), hooks in hooks/, and state logic in store/ (useAppStore)); also note where mocks/live integration tests belong for services/ and any recommended test utilities or setup files (jest setup, testing-library config).
+
+============================================================================
+File: gemini.md
+Line: 46 to 55
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @gemini.md around lines 46 - 55, Adicione em gemini.md, dentro de "Convenções de Desenvolvimento", uma subseção chamada "Acessibilidade (a11y)" contendo regras obrigatórias: usar HTML semântico (header, main, nav, landmark elements), rótulos explícitos e associados (label, fieldset/legend), atributos ARIA apenas quando necessário (aria-label, aria-labelledby, aria-describedby), navegar por teclado (tab order, role, tabindex), gestão de foco visível e programática (focus-visible, focus trap/return), links "skip to content", garantia de contraste de cor mínimo (WCAG AA), mensagens de erro acessíveis e mapeadas aos campos (usar Zod para erros e expô‑los com aria-describedby), padrões para componentes em @/components/ui para serem acessíveis por padrão, e obrigatoriedade de testes automatizados/manuais (axe, lighthouse, testes de teclado). Certifique‑se de posicionar essa subseção antes de "Estilização" e tornar estas regras mandatórias para PRs.
+
+============================================================================
+File: lib/mock-data.ts
+Line: 59 to 102
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @lib/mock-data.ts around lines 59 - 102, The MOCK_SOLICITACOES data contains responsavelId values that don't exist in the mocked registry (e.g., responsavelId "4" for Roberto Lima), which will break lookups; update either MOCK_CADASTROS to include matching cadastro entries for IDs referenced in MOCK_SOLICITACOES (e.g., add id "4"/Roberto Lima) or change the responsavelId values in MOCK_SOLICITACOES to currently existing IDs (e.g., "1"–"3") so lookups succeed; also replace the hard-coded February/2024 timestamps in MOCK_SOLICITACOES with generated/relative dates or shared fixtures/constants to avoid time-sensitive test flakiness.
+
+Review completed: 44 findings ✔

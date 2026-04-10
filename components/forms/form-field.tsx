@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -58,7 +59,10 @@ interface SelectFieldProps extends BaseFieldProps {
 
 type FormFieldProps = InputFieldProps | TextareaFieldProps | SelectFieldProps
 
-export function FormField(props: FormFieldProps) {
+export const FormField = React.forwardRef<
+  HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement,
+  FormFieldProps
+>((props, ref) => {
   const { label, name, error, required, hint, className } = props
 
   const fieldId = `field-${name}`
@@ -87,6 +91,7 @@ export function FormField(props: FormFieldProps) {
 
       {props.type === 'textarea' ? (
         <Textarea
+          ref={ref as any}
           id={fieldId}
           name={name}
           value={props.value}
@@ -110,6 +115,7 @@ export function FormField(props: FormFieldProps) {
           disabled={props.disabled}
         >
           <SelectTrigger
+            ref={ref as any}
             id={fieldId}
             aria-required={required}
             aria-invalid={!!error}
@@ -131,6 +137,7 @@ export function FormField(props: FormFieldProps) {
         </Select>
       ) : (
         <Input
+          ref={ref as any}
           id={fieldId}
           name={name}
           type={props.type}
@@ -169,4 +176,6 @@ export function FormField(props: FormFieldProps) {
       )}
     </div>
   )
-}
+})
+
+FormField.displayName = 'FormField'

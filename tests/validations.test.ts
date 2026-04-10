@@ -9,7 +9,7 @@ import {
   maskPhone,
   validate,
   required,
-} from '../lib/validations.ts'
+} from '../lib/validations'
 
 test('cpf validation accepts valid CPF and rejects invalid ones', () => {
   assert.equal(cpf().validate('529.982.247-25'), true)

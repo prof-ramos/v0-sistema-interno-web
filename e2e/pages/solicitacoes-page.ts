@@ -24,7 +24,7 @@ export class SolicitacoesPage extends BasePage {
     this.novaSolicitacaoButton = page.getByRole('button', { name: 'Nova Solicitação' })
     this.clearFiltersButton = page.getByRole('button', { name: 'Limpar' })
     this.dataTable = page.getByRole('table')
-    this.deleteDialog = page.getByRole('alertdialog', { name: 'Excluir Solicitação' })
+    this.deleteDialog = page.getByRole('alertdialog')
     this.viewDialog = page.getByRole('dialog').filter({ hasText: 'Detalhes da solicitação' })
   }
 

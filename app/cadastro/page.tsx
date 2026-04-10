@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/store/use-app-store'
 import { useValidation } from '@/hooks/use-validation'
 import { useAutoSave } from '@/hooks/use-debounce'
+import { isDeepEqual } from '@/lib/utils'
 import { cadastroValidationRules, maskCPFOrCNPJ, maskPhone, maskCEP } from '@/lib/validations'
 import { UF_OPTIONS } from '@/lib/constants'
 import type { CadastroForm, Cadastro } from '@/lib/types'
@@ -63,7 +64,7 @@ export default function CadastroPage() {
   }, [rascunhos.cadastro, selectedId])
 
   const hasUnsavedDraftChanges = useMemo(
-    () => formData !== initialFormData && formData !== rascunhos.cadastro,
+    () => !isDeepEqual(formData, initialFormData) && !isDeepEqual(formData, rascunhos.cadastro),
     [formData, rascunhos.cadastro]
   )
 
@@ -190,7 +191,7 @@ export default function CadastroPage() {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-8 lg:grid-cols-3">
         {/* Form */}
         <div className="lg:col-span-2 space-y-6">
           <SectionCard title="Dados do Cadastro">
@@ -411,7 +412,7 @@ export default function CadastroPage() {
                       onClick={() => handleSelectCadastro(cadastro)}
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{cadastro.nome}</p>
+                        <p className="truncate text-sm font-serif font-bold">{cadastro.nome}</p>
                         <p className="truncate text-xs text-muted-foreground">{cadastro.email}</p>
                       </div>
                       <div className="flex items-center gap-2 ml-2">
@@ -420,6 +421,7 @@ export default function CadastroPage() {
                           variant="ghost"
                           size="icon"
                           className="size-8 text-muted-foreground hover:text-destructive"
+                          aria-label={`Excluir cadastro de ${cadastro.nome}`}
                           onClick={(e: React.MouseEvent) => {
                             e.stopPropagation()
                             handleDelete(cadastro.id)

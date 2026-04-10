@@ -106,3 +106,16 @@ Utilize os comandos abaixo para gerenciar o ciclo de vida do projeto:
 
 - A aplicação utiliza logs categorizados: `info`, `warn`, `error` no server incluindo tracing (ex: `traceId`, `userId`, `component`).
 - Monitorar a SLO de taxa de erro (< 1%) no cliente para garantir estabilidade, e correlacionar crashes aos deployments.
+
+## Segurança
+
+- **Autenticação**: Integração planejada com NextAuth.js / Auth.js para suporte a OAuth2 e MFA.
+- **Autorização**: Controle de acesso baseado em roles (RBAC) validado em todas as chamadas de API (Server Components & Route Handlers).
+- **Proteção de Dados**: Sanitização de inputs via Zod e headers de segurança (HSTS, CSP, X-Frame-Options) configurados no `next.config`.
+- **Sensibilidade**: Dados PII são mascarados na interface e truncados em logs de depuração.
+
+## Banco de Dados
+
+- **ORM**: Prisma ou Drizzle (Sugerido) para gerenciamento de schema e migrações type-safe.
+- **Cache**: Estratégia de revalidação de tags do Next.js aliada a Redis para sessões distribuídas se necessário.
+- **Migrações**: Processo automatizado via CI/CD, com rollback testado em ambiente de staging.

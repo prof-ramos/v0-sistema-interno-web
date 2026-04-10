@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ErrorAlert } from '@/components/feedback'
 
@@ -10,6 +11,8 @@ interface GlobalErrorProps {
 }
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
+  const router = useRouter()
+
   useEffect(() => {
     console.error(error)
   }, [error])
@@ -23,7 +26,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           onRetry={reset}
         />
         <div className="flex justify-end">
-          <Button variant="outline" onClick={() => window.location.assign('/')}>
+          <Button variant="outline" onClick={() => router.replace('/')}>
             Voltar ao dashboard
           </Button>
         </div>

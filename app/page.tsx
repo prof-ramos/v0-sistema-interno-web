@@ -112,7 +112,7 @@ export default function DashboardPage() {
                       <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
                       <p className="text-4xl font-serif font-bold">{stat.value}</p>
                     </div>
-                    <div className={cn('rounded-sm p-2 bg-slate-50 border border-slate-200/50', stat.color)}>
+                    <div className={cn('rounded-sm p-2 border', stat.color)}>
                       <stat.icon className="size-6" />
                     </div>
                   </div>

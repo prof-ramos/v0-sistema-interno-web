@@ -9,7 +9,7 @@ Abaixo está o detalhamento do Design System completo, estruturado para seguir a
 ### 1.1 — Espaçamento (8pt Grid)
 
 | Token | Valor | Uso |
-|---|---|---|
+| --- | --- | --- |
 | `--space-1` | `4px` | Ajuste fino: gap entre ícone e label, padding interno de badges |
 | `--space-2` | `8px` | Padding interno de chips/tags, gap mínimo entre elementos |
 | `--space-3` | `16px` | Padding de inputs, gap padrão entre itens de lista, margens mobile |
@@ -27,7 +27,7 @@ Abaixo está o detalhamento do Design System completo, estruturado para seguir a
 Base: `1rem = 16px`, ratio `1.250`.
 
 | Token | Tamanho | Line-Height (1.5×) | Peso | Uso |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `--text-xs` | `0.64rem` (10.24px) | `1rem` (16px) | 400 | Micro-labels, counters de badge |
 | `--text-sm` | `0.8rem` (12.8px) | `1.25rem` (20px) | 400 | Captions, metadata de data, status tags |
 | `--text-base` | `1rem` (16px) | `1.5rem` (24px) | 400 | Corpo de texto, inputs, labels de form |
@@ -38,13 +38,14 @@ Base: `1rem = 16px`, ratio `1.250`.
 | `--text-3xl` | `3.052rem` (48.83px) | `4rem` (64px) | 700 | Hero/Display (uso reservado) |
 
 **Famílias tipográficas:**
+
 - `--font-sans`: `'Inter', sans-serif` — Interface, corpo, labels
 - `--font-display`: `'Playfair Display', serif` — Headings H1
 
 ### 1.3 — Cores (Paleta Semântica)
 
 | Token | Hex | Uso |
-|---|---|---|
+| --- | --- | --- |
 | `--color-background` | `#f8fafc` | Fundo da página |
 | `--color-surface` | `#ffffff` | Fundo de cards, sidebar |
 | `--color-foreground` | `#495565` | Texto principal |
@@ -61,31 +62,45 @@ Base: `1rem = 16px`, ratio `1.250`.
 ### 1.4 — Breakpoints e Grid
 
 | Breakpoint | Min-Width | Colunas | Margens | Gutter |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Mobile | `0px` | 4 | `16px` (--space-3) | `16px` |
 | Tablet | `768px` | 8 | `32px` (--space-5) | `24px` |
 | Desktop | `1024px` | 12 | auto (centralizado) | `24px` |
 
 - **Container max-width**: `1200px`
-- **Sidebar/Main ratio**: `1:1.618` (Golden Ratio) → Sidebar ≈ `280px`, Conteúdo ≈ `~453px × 1.618 ≈ 920px` do espaço restante
+- **Sidebar/Main ratio**: `~1:3.3` (Fixed Sidebar) → Sidebar = `280px`, Conteúdo = `920px` (espaço restante no container de 1200px)
 
 ### 1.5 — Proporções de Aspecto
 
 | Uso | Ratio |
-|---|---|
+| --- | --- |
 | Cards de mídia/imagem | `16:9` |
 | Ícones / Avatars | `1:1` (40×40px, 48×48px, 64×64px) |
 | Stat Cards (KPI) | `~3:2` (min-width proporcional) |
-| Sidebar : Main Content | `1 : 1.618` |
+| Sidebar : Main Content | `1 : 3.3` |
 
 ### 1.6 — Acessibilidade (WCAG 2.1)
 
 | Regra | Valor | Notas |
-|---|---|---|
+| --- | --- | --- |
 | Min touch target | `44 × 44px` | Botões, links, ícones clicáveis |
 | Line-height mínimo | `1.5 × font-size` | Já garantido na escala acima |
 | Contraste mínimo (AA) | `4.5:1` texto normal, `3:1` texto grande | `#495565` sobre `#fff` = ~5.9:1 ✓ |
 | Focus visible | `2px solid var(--color-accent)` + offset `2px` | Todos os interativos |
+| ARIA Roles | `id="sidebar"` no aside, `aria-controls` no botão | Validação de navegação |
+
+### 1.7 — Bordas e Sombras
+
+| Token | Valor | Uso |
+| --- | --- | --- |
+| `--radius-sm` | `2px` | Inputs, badges, checkboxes |
+| `--radius-md` | `8px` (`--space-2`) | Botões, dropdowns, cards densos |
+| `--radius-lg` | `16px` (`--space-3`) | Cards de seção, containers principais |
+| `--radius-full` | `9999px` | Avatars, botões de pílula |
+| `--border-width` | `1px` | Bordas padrão de separação |
+| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Elevação base (Cards) |
+| `--shadow-md` | `0 4px 6px ...` | Hover de cards, popovers |
+| `--shadow-lg` | `0 10px 15px ...` | Overlays, diálogos, menus suspensos |
 
 ---
 
@@ -108,7 +123,7 @@ Base: `1rem = 16px`, ratio `1.250`.
   <div class="ds-layout">
 
     <!-- SIDEBAR (navigation) -->
-    <aside class="ds-sidebar" aria-label="Menu principal">
+    <aside class="ds-sidebar" id="sidebar" aria-label="Menu principal">
       <div class="ds-sidebar__header">
         <img src="/logo.svg" alt="" class="ds-sidebar__logo" width="40" height="40" />
         <div class="ds-sidebar__brand">
@@ -187,7 +202,7 @@ Base: `1rem = 16px`, ratio `1.250`.
 :root {
   /* ── Spacing (8pt grid) ── */
   --space-unit: 8px;
-  --space-1:  4px;                          /* ajuste fino */
+  --space-1:  calc(var(--space-unit) * 0.5);   /* 4px - ajuste fino */
   --space-2:  calc(var(--space-unit) * 1);  /* 8px  */
   --space-3:  calc(var(--space-unit) * 2);  /* 16px */
   --space-4:  calc(var(--space-unit) * 3);  /* 24px */

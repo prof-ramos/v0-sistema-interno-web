@@ -15,7 +15,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.446 0.03 256);
   /* Primary: ASOF Institucional (#040920) */
-  --primary: #040920;
+  --primary: oklch(0.122 0.034 265);
   --primary-foreground: oklch(1 0 0);
   /* Secondary: slate-100 */
   --secondary: oklch(0.968 0.003 264);
@@ -24,8 +24,8 @@
   --muted: oklch(0.968 0.003 264);
   --muted-foreground: oklch(0.554 0.022 257);
   /* Accent: ASOF Accent (#82b4d6) */
-  --accent: #82b4d6;
-  --accent-foreground: #040920;
+  --accent: oklch(0.737 0.08 236);
+  --accent-foreground: oklch(0.122 0.034 265);
   /* Destructive: red-600 */
   --destructive: oklch(0.577 0.245 27);
   --destructive-foreground: oklch(1 0 0);
@@ -34,7 +34,7 @@
   /* Input: slate-200 */
   --input: oklch(0.929 0.006 264);
   /* Ring: #82b4d6 (Accent) */
-  --ring: #82b4d6;
+  --ring: oklch(0.737 0.08 236);
   /* Bordas: rounded-sm */
   --radius: 0.125rem;
   
@@ -110,8 +110,8 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-sans), 'Inter', sans-serif;
-  --font-serif: var(--font-serif), 'Playfair Display', serif;
+  --font-sans: var(--font-inter), 'Inter', sans-serif;
+  --font-serif: var(--font-playfair), 'Playfair Display', serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -137,8 +137,8 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: max(0px, calc(var(--radius) - 4px));
+  --radius-md: max(0px, calc(var(--radius) - 2px));
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-sidebar: var(--sidebar);
@@ -158,8 +158,11 @@
 }
 
 @layer base {
+  a, button, input, textarea, select, [role="button"], [tabindex] {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2;
+  }
   * {
-    @apply border-border outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;

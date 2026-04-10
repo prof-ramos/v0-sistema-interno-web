@@ -9,15 +9,12 @@ export function isDeepEqual(obj1: any, obj2: any): boolean {
   const visited = new WeakMap<object, WeakSet<object>>()
 
   function deepEqual(a: any, b: any): boolean {
-    // Strict identity (handles primitives, functions, same-ref objects)
     if (a === b) return true
 
-    // Handle NaN
     if (typeof a === 'number' && typeof b === 'number' && Number.isNaN(a) && Number.isNaN(b)) {
       return true
     }
 
-    // Null/non-object guard
     if (
       typeof a !== 'object' || a === null ||
       typeof b !== 'object' || b === null
@@ -25,12 +22,14 @@ export function isDeepEqual(obj1: any, obj2: any): boolean {
       return false
     }
 
-    // Prototype/constructor mismatch
     if (Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) {
       return false
     }
 
-    // Circular reference detection
+    // Circular reference detection. 
+    // If we encounter the same pair (a, b) again on the current recursion path, 
+    // it implies they are structurally equivalent within the existing cycle context, 
+    // so we return true to break the recursion.
     let visitedForA = visited.get(a)
     if (visitedForA) {
       if (visitedForA.has(b)) return true
@@ -40,43 +39,96 @@ export function isDeepEqual(obj1: any, obj2: any): boolean {
     }
     visitedForA.add(b)
 
-    // Date comparison
     if (a instanceof Date && b instanceof Date) {
       return a.getTime() === b.getTime()
     }
 
-    // RegExp comparison
     if (a instanceof RegExp && b instanceof RegExp) {
       return a.source === b.source && a.flags === b.flags
     }
-
-    // Map comparison
-    if (a instanceof Map && b instanceof Map) {
-      if (a.size !== b.size) return false
-      for (const [key, val] of a) {
-        if (!b.has(key) || !deepEqual(val, b.get(key))) return false
-      }
-      return true
+    
+    if (a instanceof Error && b instanceof Error) {
+      // Stack is environment-sensitive, comparing name and message for stability.
+      return a.name === b.name && a.message === b.message
     }
 
-    // Set comparison
-    if (a instanceof Set && b instanceof Set) {
-      if (a.size !== b.size) return false
-      for (const item of a) {
-        // For primitive values, use has(); for objects, fall back to deep search
-        if (!a.has(item) || !b.has(item)) {
-          // Deep containment check for object elements
-          let found = false
-          for (const bItem of b) {
-            if (deepEqual(item, bItem)) { found = true; break }
-          }
-          if (!found) return false
+    // ArrayBuffer / DataView / TypedArray comparison
+    if ((a instanceof ArrayBuffer || a instanceof DataView) && (b instanceof ArrayBuffer || b instanceof DataView)) {
+      const viewA = a instanceof ArrayBuffer ? new Uint8Array(a) : new Uint8Array(a.buffer, a.byteOffset, a.byteLength)
+      const viewB = b instanceof ArrayBuffer ? new Uint8Array(b) : new Uint8Array(b.buffer, b.byteOffset, b.byteLength)
+      if (viewA.length !== viewB.length) return false
+      for (let i = 0; i < viewA.length; i++) {
+        if (viewA[i] !== viewB[i]) {
+          // Handle NaN in typed arrays
+          if (Number.isNaN(viewA[i]) && Number.isNaN(viewB[i])) continue
+          return false
         }
       }
       return true
     }
+    
+    // Check if it's a TypedArray (Uint8Array, Float32Array, etc.)
+    if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b) && !(a instanceof DataView)) {
+      const viewA = a as any
+      const viewB = b as any
+      if (viewA.length !== viewB.length) return false
+      for (let i = 0; i < viewA.length; i++) {
+        if (viewA[i] !== viewB[i]) {
+          if (Number.isNaN(viewA[i]) && Number.isNaN(viewB[i])) continue
+          return false
+        }
+      }
+      return true
+    }
+    
+    // Promise/WeakMap/WeakSet are non-comparable
+    if (a instanceof Promise || a instanceof WeakMap || a instanceof WeakSet) {
+      return false
+    }
 
-    // Array comparison (ordered)
+    // Map comparison: compare entries with one-to-one matching
+    if (a instanceof Map && b instanceof Map) {
+      if (a.size !== b.size) return false
+      const matchedBKeys = new Set<any>()
+      
+      for (const [aKey, aVal] of a) {
+        let found = false
+        for (const [bKey, bVal] of b) {
+          if (matchedBKeys.has(bKey)) continue
+          if (deepEqual(aKey, bKey)) {
+            if (deepEqual(aVal, bVal)) {
+              matchedBKeys.add(bKey)
+              found = true
+              break
+            }
+          }
+        }
+        if (!found) return false
+      }
+      return true
+    }
+
+    // Set comparison: compare items with one-to-one matching
+    if (a instanceof Set && b instanceof Set) {
+      if (a.size !== b.size) return false
+      const bItems = Array.from(b)
+      const matchedBIndices = new Set<number>()
+      
+      for (const aItem of a) {
+        let found = false
+        for (let i = 0; i < bItems.length; i++) {
+          if (matchedBIndices.has(i)) continue
+          if (deepEqual(aItem, bItems[i])) {
+            matchedBIndices.add(i)
+            found = true
+            break
+          }
+        }
+        if (!found) return false
+      }
+      return true
+    }
+
     if (Array.isArray(a) && Array.isArray(b)) {
       if (a.length !== b.length) return false
       for (let i = 0; i < a.length; i++) {
@@ -85,16 +137,15 @@ export function isDeepEqual(obj1: any, obj2: any): boolean {
       return true
     }
 
-    // Catch mismatched types (e.g. Array vs plain object)
-    if (Array.isArray(a) !== Array.isArray(b)) return false
-
-    // Plain object comparison
-    const keys1 = Object.keys(a)
-    const keys2 = Object.keys(b)
+    // Plain object comparison (all instance properties + symbols)
+    const keys1 = [...Object.getOwnPropertyNames(a), ...Object.getOwnPropertySymbols(a)]
+    const keys2 = [...Object.getOwnPropertyNames(b), ...Object.getOwnPropertySymbols(b)]
     if (keys1.length !== keys2.length) return false
 
+    // Objects must have same keys (including non-enumerable and symbols)
+    const set2 = new Set<any>(keys2)
     for (const key of keys1) {
-      if (!Object.hasOwn(b, key) || !deepEqual(a[key], b[key])) {
+      if (!set2.has(key) || !deepEqual(a[key], b[key])) {
         return false
       }
     }

@@ -24,7 +24,7 @@ export class DocumentosPage extends BasePage {
     this.novoDocumentoButton = page.getByRole('button', { name: 'Novo Documento' })
     this.clearFiltersButton = page.getByRole('button', { name: 'Limpar' })
     this.dataTable = page.getByRole('table')
-    this.deleteDialog = page.getByRole('alertdialog')
+    this.deleteDialog = page.getByTestId('confirm-dialog')
     this.viewDialog = page.getByRole('dialog').filter({ hasText: 'Visualizacao do documento' })
   }
 

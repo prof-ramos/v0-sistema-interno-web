@@ -107,7 +107,7 @@ e padrões já existentes na codebase, sem propor alterações.
 ## Motion e interações
 
 - Easing principal: `--ease-elegant` (cubic-bezier 0.22,1,0.36,1)
-- Duracões padrão: 150ms (fast), 400ms (normal), 800ms (elegant)
+- Durações padrão: 150ms (fast), 400ms (normal), 800ms (elegant)
 - Hover: leves lifts/scale, underline expand em links
 - Respeitar `prefers-reduced-motion`
 

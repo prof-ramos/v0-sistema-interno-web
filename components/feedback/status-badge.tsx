@@ -84,7 +84,7 @@ interface CadastroStatusBadgeProps {
 
 const CADASTRO_STATUS_COLORS = {
   ativo: 'bg-success/15 text-success border-success/30 dark:bg-success/10 dark:text-success',
-  inativo: 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-400',
+  inativo: 'bg-slate-100 text-slate-800 border-slate-200/50 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800/50',
   pendente: 'bg-warning/15 text-warning border-warning/30 dark:bg-warning/10 dark:text-warning',
 }
 

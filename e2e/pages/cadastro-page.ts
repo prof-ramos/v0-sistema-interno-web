@@ -2,7 +2,7 @@ import type { Locator, Page } from '@playwright/test'
 import { expect } from '@playwright/test'
 import { BasePage } from './base-page'
 
-export interface CadastroFormData {
+interface CadastroFormData {
   nome: string
   cpfCnpj: string
   email: string

@@ -12,7 +12,7 @@
  * ```
  */
 
-export interface ErrorMetadata {
+interface ErrorMetadata {
   digest?: string
   component?: string
   context?: Record<string, unknown>

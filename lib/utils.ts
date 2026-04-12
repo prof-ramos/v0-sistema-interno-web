@@ -26,10 +26,9 @@ export function isDeepEqual(obj1: unknown, obj2: unknown): boolean {
       return false
     }
 
-    // Circular reference detection. 
-    // If we encounter the same pair (a, b) again on the current recursion path, 
-    // it implies they are structurally equivalent within the existing cycle context, 
-    // so we return true to break the recursion.
+    // Circular reference detection (bidirectional).
+    // Track both a→b and b→a to avoid false positives when the same
+    // object appears paired with different counterparts in separate branches.
     let visitedForA = visited.get(a)
     if (visitedForA) {
       if (visitedForA.has(b)) return true
@@ -38,6 +37,15 @@ export function isDeepEqual(obj1: unknown, obj2: unknown): boolean {
       visited.set(a, visitedForA)
     }
     visitedForA.add(b)
+
+    let visitedForB = visited.get(b)
+    if (visitedForB) {
+      if (visitedForB.has(a)) return true
+    } else {
+      visitedForB = new WeakSet()
+      visited.set(b, visitedForB)
+    }
+    visitedForB.add(a)
 
     if (a instanceof Date && b instanceof Date) {
       return a.getTime() === b.getTime()

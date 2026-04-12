@@ -204,9 +204,3 @@ export const useAppStore = create<AppStore>()(
   )
 )
 
-// Seletores para uso otimizado
-export const useCadastros = () => useAppStore((state) => state.cadastros)
-export const useSolicitacoes = () => useAppStore((state) => state.solicitacoes)
-export const useDocumentos = () => useAppStore((state) => state.documentos)
-export const useConfiguracoes = () => useAppStore((state) => state.configuracoes)
-export const useRascunhos = () => useAppStore((state) => state.rascunhos)

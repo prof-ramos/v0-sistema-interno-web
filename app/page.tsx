@@ -76,7 +76,7 @@ export default function DashboardPage() {
       icon: Users,
       href: ROUTES.CADASTRO,
       color: 'text-primary bg-primary/10 border-primary/20',
-      detail: `${localCadastros.filter((item: Cadastro) => item.status === 'ativo').length} ativos`,
+      detail: `${localCadastros.filter((item: Cadastro) => item.status === 'ATIVO').length} ativos`,
     },
     {
       label: 'Solicitações',

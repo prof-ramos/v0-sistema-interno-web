@@ -36,31 +36,12 @@ export function createDataSnapshot<T>(value: T): string {
   return normalizeDataSnapshot(value)
 }
 
-/**
- * Hook para debounce de valores
- */
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
-
 type DebouncedArgs = unknown[]
 
 /**
  * Hook para debounce de callbacks
  */
-export function useDebouncedCallback<Args extends DebouncedArgs>(
+function useDebouncedCallback<Args extends DebouncedArgs>(
   callback: (...args: Args) => void | Promise<void>,
   delay: number,
   onError?: (err: unknown) => void
@@ -127,13 +108,19 @@ export function useAutoSave<T>(
     // setIsSaving(false) is handled by debouncedSave's finally block — no redundant call
   }, [])
 
+  const savingRef = useRef(false)
+
   const debouncedSave = useDebouncedCallback(async (newData: T, snapshot: string) => {
+    // Mutex: skip if another save is already in flight
+    if (savingRef.current) return
+    savingRef.current = true
     try {
       setSaveError(null)
       await onSave(newData)
       previousSnapshotRef.current = snapshot
       setLastSaved(new Date())
     } finally {
+      savingRef.current = false
       setIsSaving(false)
     }
   }, delay, handleSaveError)

@@ -3,12 +3,12 @@
 import { useState, useCallback, useMemo } from 'react'
 import { z } from 'zod'
 
-export interface UseValidationOptions<T extends z.ZodRawShape> {
+interface UseValidationOptions<T extends z.ZodRawShape> {
   schema: z.ZodObject<T>
   validateOnChange?: boolean
 }
 
-export interface UseValidationReturn<T extends Record<string, any>> {
+interface UseValidationReturn<T extends Record<string, any>> {
   errors: Record<string, string>
   touched: Record<string, boolean>
   isValid: boolean

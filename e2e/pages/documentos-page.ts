@@ -38,7 +38,10 @@ export class DocumentosPage extends BasePage {
 
   private async selectFilter(filterLocator: Locator, option: string) {
     await filterLocator.click()
-    await this.page.getByRole('option', { name: option }).click()
+    const optionLocator = this.page.getByRole('option', { name: option })
+    await optionLocator.click()
+    // Wait for dropdown to close and table to re-render
+    await optionLocator.waitFor({ state: 'hidden', timeout: 5000 })
   }
 
   async filterByTipo(tipo: string) {

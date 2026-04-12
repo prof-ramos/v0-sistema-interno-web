@@ -36,14 +36,20 @@ export class SolicitacoesPage extends BasePage {
     await this.searchInput.fill(text)
   }
 
+  private async selectFilter(filterLocator: Locator, option: string) {
+    await filterLocator.click()
+    const optionLocator = this.page.getByRole('option', { name: option })
+    await optionLocator.click()
+    // Wait for dropdown to close and table to re-render
+    await optionLocator.waitFor({ state: 'hidden', timeout: 5000 })
+  }
+
   async filterByStatus(status: string) {
-    await this.statusFilter.click()
-    await this.page.getByRole('option', { name: status }).click()
+    await this.selectFilter(this.statusFilter, status)
   }
 
   async filterByPrioridade(prioridade: string) {
-    await this.prioridadeFilter.click()
-    await this.page.getByRole('option', { name: prioridade }).click()
+    await this.selectFilter(this.prioridadeFilter, prioridade)
   }
 
   async clearFilters() {

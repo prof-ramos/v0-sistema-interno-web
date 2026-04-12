@@ -2,9 +2,9 @@ import { z } from 'zod'
 
 // ===== SCHEMAS BASE =====
 
-export const emailSchema = z.string().email('E-mail inválido')
+const emailSchema = z.string().email('E-mail inválido')
 
-export const cpfSchema = z.string().refine((val) => {
+const cpfSchema = z.string().refine((val) => {
   const clean = val.replace(/\D/g, '')
   if (clean.length !== 11) return false
   if (/^(\d)\1{10}$/.test(clean)) return false
@@ -22,7 +22,7 @@ export const cpfSchema = z.string().refine((val) => {
   return digit === parseInt(clean[10])
 }, 'CPF inválido')
 
-export const cnpjSchema = z.string().refine((val) => {
+const cnpjSchema = z.string().refine((val) => {
   const clean = val.replace(/\D/g, '')
   if (clean.length !== 14) return false
   if (/^(\d)\1{13}$/.test(clean)) return false
@@ -41,7 +41,7 @@ export const cnpjSchema = z.string().refine((val) => {
   return digit === parseInt(clean[13])
 }, 'CNPJ inválido')
 
-export const cpfOrCnpjSchema = z.string().refine((val) => {
+const cpfOrCnpjSchema = z.string().refine((val) => {
   const clean = val.replace(/\D/g, '')
   if (clean.length === 11) {
     // Basic check for CPF
@@ -62,12 +62,12 @@ export const cpfOrCnpjSchema = z.string().refine((val) => {
   }
 })
 
-export const phoneSchema = z.string().refine((val) => {
+const phoneSchema = z.string().refine((val) => {
   const clean = val.replace(/\D/g, '')
   return clean.length >= 10 && clean.length <= 11
 }, 'Telefone inválido')
 
-export const cepSchema = z.string().refine((val) => {
+const cepSchema = z.string().refine((val) => {
   const clean = val.replace(/\D/g, '')
   return clean.length === 8
 }, 'CEP inválido')
@@ -91,29 +91,9 @@ export const cadastroSchema = z.object({
   status: z.enum(['ATIVO', 'INATIVO', 'PENDENTE']).default('ATIVO'),
 })
 
-export const solicitacaoSchema = z.object({
-  titulo: z.string().min(5, 'Título deve ter pelo menos 5 caracteres'),
-  descricao: z.string().min(10, 'Descrição deve ter pelo menos 10 caracteres'),
-  tipo: z.string().min(1, 'Campo obrigatório'),
-  prioridade: z.enum(['baixa', 'media', 'alta', 'urgente']),
-  status: z.enum(['pendente', 'em_analise', 'aprovada', 'rejeitada', 'concluida']).default('pendente'),
-  dataLimite: z.string().optional(),
-})
-
-export const documentoSchema = z.object({
-  tipo: z.enum(['oficio', 'memorando', 'portaria', 'decreto', 'contrato', 'outro']),
-  titulo: z.string().min(3, 'Título deve ter pelo menos 3 caracteres'),
-  destinatario: z.string().min(1, 'Campo obrigatório'),
-  remetente: z.string().min(1, 'Campo obrigatório'),
-  assunto: z.string().min(1, 'Campo obrigatório'),
-  conteudo: z.string().min(10, 'Conteúdo deve ter pelo menos 10 caracteres'),
-  status: z.enum(['rascunho', 'finalizado', 'enviado', 'arquivado']).default('rascunho'),
-  numero: z.string().optional(),
-})
-
 // ===== MÁSCARAS =====
 
-export function maskCPF(value: string): string {
+function maskCPF(value: string): string {
   return value
     .replace(/\D/g, '')
     .replace(/(\d{3})(\d)/, '$1.$2')
@@ -122,7 +102,7 @@ export function maskCPF(value: string): string {
     .slice(0, 14)
 }
 
-export function maskCNPJ(value: string): string {
+function maskCNPJ(value: string): string {
   return value
     .replace(/\D/g, '')
     .replace(/(\d{2})(\d)/, '$1.$2')

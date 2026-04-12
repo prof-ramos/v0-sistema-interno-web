@@ -12,10 +12,10 @@ O sistema é uma aplicação web de gestão integrada que permite o gerenciament
 - **Linguagem:** TypeScript
 - **Estilização:** Tailwind CSS v4 + PostCSS
 - **Componentes UI:** Radix UI (base para padrões Shadcn UI)
-- **Gerenciamento de Estado:** Zustand (com persistência local)
+- **Gerenciamento de Estado:** Zustand (persistência seletiva — apenas configurações não-PII)
 - **Validação e Tipagem:** Zod + Custom Hooks
 - **Ícones:** Lucide React
-- **Gráficos:** Recharts
+- **ORM:** Prisma (SQLite via better-sqlite3 em dev, PostgreSQL em produção)
 
 ## Arquitetura e Estrutura de Pastas
 
@@ -74,7 +74,7 @@ Utilize os comandos abaixo para gerenciar o ciclo de vida do projeto:
 ## Fluxos de Trabalho Implementados
 
 1. **Auto-Save:** O sistema possui um mecanismo de rascunho automático (com `debounce` ex: 1000ms a 5000ms) em formulários de cadastro e ações contínuas para evitar perda de dados.
-2. **Persistência:** Dados simulados e alterações do usuário são atualmente persistidos no `localStorage` via Zustand `persist` middleware com `partialize` **em todos os ambientes**. **Risco aceito (MVP):** campos PII (nome, cpfCnpj, email, telefone, endereço em `cadastros`; perfil em `configuracoes`) permanecem no cliente durante a fase de protótipo. **Plano de migração:** ao implementar o backend (Prisma + PostgreSQL), remover slices PII do `partialize`, migrar para APIs autenticadas, e usar SQLite para testes locais em desenvolvimento. Os campos PII estão marcados com `⚠ PII` no `partialize` do store para referência.
+2. **Persistência:** O módulo de Cadastros foi migrado para **Prisma + SQLite** (dev) / **PostgreSQL** (prod) via API Routes (`/api/cadastros`). O `localStorage` (Zustand `persist` + `partialize`) é usado **apenas para configurações não-PII** (tema, idioma, notificações). Dados sensíveis (nome, cpfCnpj, email, telefone, endereço) **não são mais armazenados no cliente**. Os demais módulos (Solicitações, Documentos) ainda usam dados mock e serão migrados incrementalmente.
 3. **Feedback:** Ações irreversíveis (ex: Excluir) devem invocar um `<ConfirmDialog>`. Mensagens rápidas e fluxos não bloqueantes (ex: Sucesso ao salvar) utilizam `sonner` toasts categorizadas por severidade (success, error, warning).
 
 ## Configuração de Ambiente
@@ -116,6 +116,7 @@ Utilize os comandos abaixo para gerenciar o ciclo de vida do projeto:
 
 ## Banco de Dados
 
-- **ORM**: Prisma ou Drizzle (Sugerido) para gerenciamento de schema e migrações type-safe.
+- **ORM**: Prisma 7 com output customizado (`lib/generated/prisma`). Driver adapter `@prisma/adapter-better-sqlite3` em dev, PostgreSQL em produção.
+- **Schema**: Enums `Tipo` (FISICA, JURIDICA) e `Status` (ATIVO, INATIVO, PENDENTE) definidos no `prisma/schema.prisma`.
 - **Cache**: Estratégia de revalidação de tags do Next.js aliada a Redis para sessões distribuídas se necessário.
-- **Migrações**: Processo automatizado via CI/CD, com rollback testado em ambiente de staging.
+- **Migrações**: Gerenciadas via `npx prisma migrate dev`. Processo automatizado via CI/CD, com rollback testado em ambiente de staging.

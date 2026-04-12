@@ -16,7 +16,7 @@ async function main() {
     id: c.id,
     nome: c.nome,
     cpfCnpj: c.cpfCnpj.replace(/\D/g, ''),
-    tipo: (c.tipo === 'pessoa_fisica' ? 'FISICA' : 'JURIDICA') as any,
+    tipo: c.tipo,
     email: c.email,
     telefone: c.telefone,
     cep: c.cep.replace(/\D/g, ''),
@@ -27,7 +27,7 @@ async function main() {
     cidade: c.cidade,
     uf: c.uf,
     observacoes: c.observacoes || null,
-    status: (c.status.toUpperCase()) as any,
+    status: c.status,
     criadoEm: new Date(c.criadoEm),
     atualizadoEm: new Date(c.atualizadoEm),
   }))

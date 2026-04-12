@@ -14,7 +14,7 @@ import type {
 
 // ===== ROTAS =====
 
-export interface NavItem {
+interface NavItem {
   label: string
   href: string
   icon: LucideIcon

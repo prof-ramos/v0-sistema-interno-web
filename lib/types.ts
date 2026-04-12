@@ -112,18 +112,6 @@ export interface AppState {
   }
 }
 
-// ===== VALIDAÇÃO =====
-
-export interface ValidationError {
-  field: string
-  message: string
-}
-
-export interface ValidationResult {
-  isValid: boolean
-  errors: ValidationError[]
-}
-
 // ===== TABELA =====
 
 export interface Column<T> {

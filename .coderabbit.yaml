@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "pt-BR"
+early_access: false
+reviews:
+  profile: "assertive"
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: true
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "**/*.ts"
+      instructions: "Gere feedbacks com foco em tipagem estrita do TypeScript, modularidade, tratamento correto de erros e early returns. Siga o padrão de Enums simulados como literals sempre em UPPERCASE."
+    - path: "**/*.tsx"
+      instructions: "Verifique sempre a semântica de acessibilidade (a11y como labels, aria-*, tabIndex) e classes Tailwind CSS v4 válidas. Componentes devem priorizar performance (evite renderizações desnecessárias)."
+    - path: "e2e/**"
+      instructions: "Garanta que os testes do Playwright tenham asserts resilientes (auto-retrying) e evite race conditions adicionando esperas explícitas ou validações corretas antes das ações (cliqes ou teclados)."
+    - path: "lib/validations.ts"
+      instructions: "Sempre foque em manter a única fonte da verdade usando a inferência correta do Zod para TypeScript."
+chat:
+  auto_reply: true

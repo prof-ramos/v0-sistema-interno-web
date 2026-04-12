@@ -12,7 +12,7 @@
  * ```
  */
 
-interface ErrorMetadata {
+export interface ErrorMetadata {
   digest?: string
   component?: string
   context?: Record<string, unknown>
@@ -21,20 +21,41 @@ interface ErrorMetadata {
 /**
  * Reports an error to the monitoring service.
  * Replace the body with Sentry.captureException(error, { extra }) when ready.
+ *
+ * Defensively handles null/undefined/non-Error values.
  */
 export function reportError(
-  error: Error & { digest?: string },
+  error: unknown,
   metadata?: Omit<ErrorMetadata, 'digest'>
 ): void {
+  // Defensive: handle null, undefined, and non-Error values
+  const isErrorLike = error != null && typeof error === 'object'
+
+  const message = isErrorLike && 'message' in error
+    ? String((error as { message: unknown }).message)
+    : String(error ?? 'Unknown error')
+
+  const name = isErrorLike && 'name' in error
+    ? String((error as { name: unknown }).name)
+    : 'Error'
+
+  const digest = isErrorLike && 'digest' in error
+    ? String((error as { digest: unknown }).digest)
+    : undefined
+
+  const stack = isErrorLike && 'stack' in error
+    ? (error as { stack?: string }).stack
+    : undefined
+
   const payload = {
-    message: error.message,
-    name: error.name,
-    digest: error.digest,
+    message,
+    name,
+    digest,
     component: metadata?.component,
     context: metadata?.context,
     timestamp: new Date().toISOString(),
     // stack is intentionally omitted from production logs
-    ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
+    ...(process.env.NODE_ENV === 'development' && { stack }),
   }
 
   console.error('[ErrorReport]', payload)

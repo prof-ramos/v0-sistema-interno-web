@@ -28,17 +28,15 @@ function now(): string {
 }
 
 interface AppStore extends AppState {
-  // Cadastros
-  addCadastro: (data: CadastroForm) => Cadastro
-  updateCadastro: (id: string, data: Partial<CadastroForm>) => void
-  deleteCadastro: (id: string) => void
+  // Cadastros - Somente leitura local (populado via Fetch)
+  setCadastros: (cadastros: Cadastro[]) => void
   
-  // Solicitações
+  // Solicitações (Manter local por ora conforme plano)
   addSolicitacao: (data: SolicitacaoForm) => Solicitacao
   updateSolicitacao: (id: string, data: Partial<SolicitacaoForm>) => void
   deleteSolicitacao: (id: string) => void
   
-  // Documentos
+  // Documentos (Manter local por ora conforme plano)
   addDocumento: (data: DocumentoForm) => Documento
   updateDocumento: (id: string, data: Partial<DocumentoForm>) => void
   deleteDocumento: (id: string) => void
@@ -59,7 +57,7 @@ interface AppStore extends AppState {
 }
 
 const initialState: AppState = {
-  cadastros: MOCK_CADASTROS,
+  cadastros: [],
   solicitacoes: MOCK_SOLICITACOES,
   documentos: MOCK_DOCUMENTOS,
   configuracoes: DEFAULT_CONFIGURACOES,
@@ -72,32 +70,7 @@ export const useAppStore = create<AppStore>()(
       ...initialState,
       
       // ===== CADASTROS =====
-      addCadastro: (data) => {
-        const novoCadastro: Cadastro = {
-          ...data,
-          id: generateId(),
-          criadoEm: now(),
-          atualizadoEm: now(),
-        }
-        set((state) => ({
-          cadastros: [...state.cadastros, novoCadastro],
-        }))
-        return novoCadastro
-      },
-      
-      updateCadastro: (id, data) => {
-        set((state) => ({
-          cadastros: state.cadastros.map((c) =>
-            c.id === id ? { ...c, ...data, atualizadoEm: now() } : c
-          ),
-        }))
-      },
-      
-      deleteCadastro: (id) => {
-        set((state) => ({
-          cadastros: state.cadastros.filter((c) => c.id !== id),
-        }))
-      },
+      setCadastros: (cadastros) => set({ cadastros }),
       
       // ===== SOLICITAÇÕES =====
       addSolicitacao: (data) => {
@@ -216,14 +189,15 @@ export const useAppStore = create<AppStore>()(
     {
       name: 'sistema-interno-storage',
       partialize: (state) => ({
-        // ⚠ PII: nome, cpfCnpj, email, telefone, endereço — migrar para backend antes de produção
-        cadastros: state.cadastros,
-        // ⚠ PII: solicitanteNome, responsavelNome — migrar para backend antes de produção
+        // ⚠ PII Compliance: 
+        // 1. Cadastros removidos (persistência no backend Prisma)
+        // 2. Perfil removido (PII sensível: nome, email)
         solicitacoes: state.solicitacoes,
-        // Contém destinatário/remetente — avaliar sensibilidade
         documentos: state.documentos,
-        // ⚠ PII: perfil.nome, perfil.email — migrar para backend antes de produção
-        configuracoes: state.configuracoes,
+        configuracoes: {
+          ...state.configuracoes,
+          perfil: undefined, // Reset do perfil no reload para segurança até migração de API
+        },
         rascunhos: state.rascunhos,
       }),
     }

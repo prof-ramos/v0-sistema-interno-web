@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useSyncExternalStore } from 'react'
+import { useState, useMemo, useEffect, useSyncExternalStore, useCallback } from 'react'
 import Link from 'next/link'
 import {
   Users,
@@ -16,8 +16,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { StatusBadge, PrioridadeBadge } from '@/components/feedback'
 import { useAppStore } from '@/store/use-app-store'
 import { ROUTES } from '@/lib/constants'
-import type { Solicitacao } from '@/lib/types'
+import type { Cadastro, Solicitacao } from '@/lib/types'
 import { cn } from '@/lib/utils'
+
+const CARD_SKELETON_HEIGHT = 'h-[132px]'
 
 const quickActions = [
   { label: 'Novo Cadastro', href: ROUTES.CADASTRO, icon: Users },
@@ -36,21 +38,45 @@ function subscribeToStoreHydration(callback: () => void) {
 }
 
 export default function DashboardPage() {
-  const { cadastros, solicitacoes, documentos } = useAppStore()
+  const { solicitacoes, documentos } = useAppStore()
+  const [localCadastros, setLocalCadastros] = useState<Cadastro[]>([])
+  const [loadingCadastros, setLoadingCadastros] = useState(true)
+
   const mounted = useSyncExternalStore(
     subscribeToStoreHydration,
     () => useAppStore.persist.hasHydrated(),
     () => false
   )
 
+  const fetchCadastros = useCallback(async () => {
+    try {
+      const resp = await fetch('/api/cadastros')
+      if (resp.ok) {
+        const data = await resp.json()
+        setLocalCadastros(data)
+      }
+    } finally {
+      setLoadingCadastros(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchCadastros()
+  }, [fetchCadastros])
+
+  const pendentes = useMemo(
+    () => solicitacoes.filter((s: Solicitacao) => s.status === 'pendente'),
+    [solicitacoes]
+  )
+
   const stats = useMemo(() => [
     {
       label: 'Cadastros',
-      value: cadastros.length,
+      value: localCadastros.length,
       icon: Users,
       href: ROUTES.CADASTRO,
       color: 'text-primary bg-primary/10 border-primary/20',
-      detail: `${cadastros.filter((item) => item.status === 'ativo').length} ativos`,
+      detail: `${localCadastros.filter((item: Cadastro) => item.status === 'ativo').length} ativos`,
     },
     {
       label: 'Solicitações',
@@ -70,13 +96,13 @@ export default function DashboardPage() {
     },
     {
       label: 'Pendentes',
-      value: solicitacoes.filter((s: Solicitacao) => s.status === 'pendente').length,
+      value: pendentes.length,
       icon: Clock,
       href: ROUTES.SOLICITACOES,
       color: 'text-amber-700 bg-amber-50 dark:bg-amber-900/20 border-amber-200',
-      detail: `${solicitacoes.filter((item) => item.status === 'pendente' && item.prioridade === 'urgente').length} urgentes`,
+      detail: `${pendentes.filter((s) => s.prioridade === 'urgente').length} urgentes`,
     },
-  ], [cadastros, solicitacoes, documentos])
+  ], [localCadastros, solicitacoes, documentos, pendentes])
 
   const recentSolicitacoes = useMemo(() => 
     [...solicitacoes]
@@ -94,9 +120,9 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {!mounted ? (
+        {!mounted || loadingCadastros ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[132px] w-full rounded-sm" />
+            <Skeleton key={i} className={`${CARD_SKELETON_HEIGHT} w-full rounded-sm`} />
           ))
         ) : (
           stats.map((stat) => (

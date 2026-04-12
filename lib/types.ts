@@ -12,7 +12,7 @@ export interface Cadastro extends BaseEntity {
   // Dados Principais
   nome: string
   cpfCnpj: string
-  tipo: 'pessoa_fisica' | 'pessoa_juridica'
+  tipo: 'FISICA' | 'JURIDICA'
   
   // Contato
   email: string
@@ -31,7 +31,7 @@ export interface Cadastro extends BaseEntity {
   observacoes?: string
   
   // Status
-  status: 'ativo' | 'inativo' | 'pendente'
+  status: 'ATIVO' | 'INATIVO' | 'PENDENTE'
 }
 
 export type CadastroForm = Omit<Cadastro, 'id' | 'criadoEm' | 'atualizadoEm'>

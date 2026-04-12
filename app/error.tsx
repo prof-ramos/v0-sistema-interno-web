@@ -23,7 +23,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
       <div className="w-full space-y-4">
         <ErrorAlert
           title="Algo deu errado"
-          message="Não foi possível carregar esta página. Tente novamente ou volte para o início."
+          message={`Não foi possível carregar esta página. Tente novamente ou volte para o início.${error.digest ? ` (Erro ID: ${error.digest})` : ''}`}
           onRetry={reset}
         />
         <div className="flex justify-end">

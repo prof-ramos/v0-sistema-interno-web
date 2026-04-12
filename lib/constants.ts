@@ -85,10 +85,10 @@ export const STATUS_DOCUMENTO_LABELS = {
 }
 
 export const STATUS_CADASTRO_LABELS = {
-  ativo: 'Ativo',
-  inativo: 'Inativo',
-  pendente: 'Pendente',
-}
+  ATIVO: 'Ativo',
+  INATIVO: 'Inativo',
+  PENDENTE: 'Pendente',
+} as const
 
 export const UF_OPTIONS = [
   { value: 'AC', label: 'Acre' },

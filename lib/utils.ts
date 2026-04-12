@@ -52,44 +52,47 @@ export function isDeepEqual(obj1: unknown, obj2: unknown): boolean {
       return a.name === b.name && a.message === b.message
     }
 
-    // ArrayBuffer / DataView / TypedArray comparison
+    // Boxed primitives: compare via valueOf()
+    if (a instanceof Number || a instanceof Boolean || a instanceof String) {
+      if (!(b instanceof a.constructor)) return false
+      return a.valueOf() === (b as typeof a).valueOf()
+    }
+
+    // ArrayBuffer / DataView comparison
     if ((a instanceof ArrayBuffer || a instanceof DataView) && (b instanceof ArrayBuffer || b instanceof DataView)) {
       const viewA = a instanceof ArrayBuffer ? new Uint8Array(a) : new Uint8Array(a.buffer, a.byteOffset, a.byteLength)
       const viewB = b instanceof ArrayBuffer ? new Uint8Array(b) : new Uint8Array(b.buffer, b.byteOffset, b.byteLength)
       if (viewA.length !== viewB.length) return false
       for (let i = 0; i < viewA.length; i++) {
-        if (viewA[i] !== viewB[i]) {
-          // NaN check: no-op for Uint8Array, but kept for generic TypedArray path (Float32/64Array)
-          if (Number.isNaN(viewA[i]) && Number.isNaN(viewB[i])) continue
-          return false
-        }
+        // Uint8Array values are always integers 0-255, NaN is impossible — no NaN check needed
+        if (viewA[i] !== viewB[i]) return false
       }
       return true
     }
     
-    // Check if it's a TypedArray (Uint8Array, Float32Array, etc.)
+    // TypedArray comparison (Float32Array, Float64Array, etc.)
     if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b) && !(a instanceof DataView)) {
-      const viewA = a as any
-      const viewB = b as any
+      const viewA = new Uint8Array(a.buffer, a.byteOffset, a.byteLength)
+      const viewB = new Uint8Array(b.buffer, b.byteOffset, b.byteLength)
       if (viewA.length !== viewB.length) return false
       for (let i = 0; i < viewA.length; i++) {
-        if (viewA[i] !== viewB[i]) {
-          if (Number.isNaN(viewA[i]) && Number.isNaN(viewB[i])) continue
-          return false
-        }
+        if (viewA[i] !== viewB[i]) return false
       }
       return true
     }
     
-    // Promise/WeakMap/WeakSet are non-comparable
-    if (a instanceof Promise || a instanceof WeakMap || a instanceof WeakSet) {
+    // Promise/WeakMap/WeakSet are non-comparable — check both sides
+    if (
+      a instanceof Promise || a instanceof WeakMap || a instanceof WeakSet ||
+      b instanceof Promise || b instanceof WeakMap || b instanceof WeakSet
+    ) {
       return false
     }
 
     // Map comparison: compare entries with one-to-one matching
     if (a instanceof Map && b instanceof Map) {
       if (a.size !== b.size) return false
-      const matchedBKeys = new Set<any>()
+      const matchedBKeys = new Set<unknown>()
       
       for (const [aKey, aVal] of a) {
         let found = false
@@ -132,7 +135,11 @@ export function isDeepEqual(obj1: unknown, obj2: unknown): boolean {
     if (Array.isArray(a) && Array.isArray(b)) {
       if (a.length !== b.length) return false
       for (let i = 0; i < a.length; i++) {
-        if (!deepEqual(a[i], b[i])) return false
+        // Sparse array handling: treat holes differently from explicit undefined
+        const aHas = Object.prototype.hasOwnProperty.call(a, String(i))
+        const bHas = Object.prototype.hasOwnProperty.call(b, String(i))
+        if (aHas !== bHas) return false
+        if (aHas && !deepEqual(a[i], b[i])) return false
       }
       return true
     }

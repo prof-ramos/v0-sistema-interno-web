@@ -122,7 +122,7 @@ export default function DocumentosPage() {
       sortable: true,
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate font-serif font-bold">{item.titulo}</p>
+          <p className="truncate font-medium">{item.titulo}</p>
           <p className="truncate text-xs text-muted-foreground">{item.assunto}</p>
         </div>
       ),

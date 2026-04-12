@@ -113,6 +113,12 @@ export const FormField = React.forwardRef<
           value={props.value}
           onValueChange={props.onChange}
           disabled={props.disabled}
+          onOpenChange={(open) => {
+            // Trigger onBlur when the dropdown closes (Select has no native onBlur)
+            if (!open) {
+              props.onBlur?.()
+            }
+          }}
         >
           <SelectTrigger
             ref={ref as any}

@@ -2,28 +2,34 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-function normalizeDataSnapshot(value: unknown, visited = new WeakSet<object>()): string {
+function normalizeDataSnapshot(value: unknown, ancestors = new WeakSet<object>()): string {
   if (value === null || typeof value !== 'object') {
     return JSON.stringify(value)
   }
 
-  // Guard against circular references
-  if (visited.has(value as object)) {
+  // Guard against circular references (track only ancestor chain, not all visited)
+  if (ancestors.has(value as object)) {
     return '"[Circular]"'
   }
-  visited.add(value as object)
+  ancestors.add(value as object)
+
+  let result: string
 
   if (Array.isArray(value)) {
-    return `[${value.map((item) => normalizeDataSnapshot(item, visited)).join(',')}]`
+    result = `[${value.map((item) => normalizeDataSnapshot(item, ancestors)).join(',')}]`
+  } else {
+    const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) =>
+      a.localeCompare(b)
+    )
+    result = `{${entries
+      .map(([key, entryValue]) => `${JSON.stringify(key)}:${normalizeDataSnapshot(entryValue, ancestors)}`)
+      .join(',')}}`
   }
 
-  const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) =>
-    a.localeCompare(b)
-  )
+  // Remove from ancestor chain after processing (shared refs are OK, only cycles are flagged)
+  ancestors.delete(value as object)
 
-  return `{${entries
-    .map(([key, entryValue]) => `${JSON.stringify(key)}:${normalizeDataSnapshot(entryValue, visited)}`)
-    .join(',')}}`
+  return result
 }
 
 export function createDataSnapshot<T>(value: T): string {
@@ -78,10 +84,13 @@ export function useDebouncedCallback<Args extends DebouncedArgs>(
       }
       
       timeoutRef.current = setTimeout(() => {
-        Promise.resolve(callbackRef.current(...args)).catch((err) => {
-          console.error('[useDebouncedCallback] Unhandled rejection:', err)
-          onErrorRef.current?.(err)
-        })
+        const promise = callbackRef.current(...args)
+        if (promise instanceof Promise) {
+          promise.catch((err) => {
+            console.error('[useDebouncedCallback] Unhandled rejection:', err)
+            onErrorRef.current?.(err)
+          })
+        }
       }, delay)
     },
     [delay]
@@ -115,7 +124,7 @@ export function useAutoSave<T>(
   
   const handleSaveError = useCallback((err: unknown) => {
     setSaveError(err)
-    setIsSaving(false)
+    // setIsSaving(false) is handled by debouncedSave's finally block — no redundant call
   }, [])
 
   const debouncedSave = useDebouncedCallback(async (newData: T, snapshot: string) => {
@@ -131,7 +140,8 @@ export function useAutoSave<T>(
   
   useEffect(() => {
     if (!enabled) {
-      previousSnapshotRef.current = currentSnapshot
+      // Don't reset previousSnapshotRef when disabled — let changes accumulate
+      // so they'll be detected when enabled flips back to true
       setIsSaving(false)
       return
     }

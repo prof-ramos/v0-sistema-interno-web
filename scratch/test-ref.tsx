@@ -6,7 +6,8 @@ export function TestComponent() {
 
   useEffect(() => {
     if (inputRef.current) {
-      console.log('Ref captured:', inputRef.current.id)
+      // Ref successfully captured — use for focus management or measurement
+      void inputRef.current.id
     }
   }, [])
 

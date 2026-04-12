@@ -20,7 +20,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     <Badge
       variant="secondary"
       className={cn(
-        'font-bold uppercase tracking-widest text-[10px]',
+        'font-bold uppercase tracking-widest text-xs',
         STATUS_SOLICITACAO_COLORS[status],
         className
       )}
@@ -40,7 +40,7 @@ export function PrioridadeBadge({ prioridade, className }: PrioridadeBadgeProps)
     <Badge
       variant="secondary"
       className={cn(
-        'font-bold uppercase tracking-widest text-[10px]',
+        'font-bold uppercase tracking-widest text-xs',
         PRIORIDADE_COLORS[prioridade],
         className
       )}
@@ -67,7 +67,7 @@ export function DocumentoStatusBadge({ status, className }: DocumentoStatusBadge
     <Badge
       variant="secondary"
       className={cn(
-        'font-bold uppercase tracking-widest text-[10px]',
+        'font-bold uppercase tracking-widest text-xs',
         DOCUMENTO_STATUS_COLORS[status],
         className
       )}
@@ -78,14 +78,14 @@ export function DocumentoStatusBadge({ status, className }: DocumentoStatusBadge
 }
 
 interface CadastroStatusBadgeProps {
-  status: 'ativo' | 'inativo' | 'pendente'
+  status: 'ATIVO' | 'INATIVO' | 'PENDENTE'
   className?: string
 }
 
 const CADASTRO_STATUS_COLORS = {
-  ativo: 'bg-success/15 text-success border-success/30 dark:bg-success/10 dark:text-success',
-  inativo: 'bg-slate-100 text-slate-800 border-slate-200/50 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800/50',
-  pendente: 'bg-warning/15 text-warning border-warning/30 dark:bg-warning/10 dark:text-warning',
+  ATIVO: 'bg-success/15 text-success border-success/30 dark:bg-success/10 dark:text-success',
+  INATIVO: 'bg-slate-100 text-slate-800 border-slate-200/50 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800/50',
+  PENDENTE: 'bg-warning/15 text-warning border-warning/30 dark:bg-warning/10 dark:text-warning',
 }
 
 export function CadastroStatusBadge({ status, className }: CadastroStatusBadgeProps) {
@@ -93,7 +93,7 @@ export function CadastroStatusBadge({ status, className }: CadastroStatusBadgePr
     <Badge
       variant="outline"
       className={cn(
-        'font-bold uppercase tracking-widest text-[10px] transition-colors',
+        'font-bold uppercase tracking-widest text-xs transition-colors',
         CADASTRO_STATUS_COLORS[status],
         className
       )}

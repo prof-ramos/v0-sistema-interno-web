@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Tipo {
+  FISICA
+  JURIDICA
+}
+
+enum Status {
+  ATIVO
+  INATIVO
+  PENDENTE
+}
+
+/// Cadastro de Pessoa Física ou Jurídica
+model Cadastro {
+  id          String   @id @default(cuid())
+  nome        String
+  cpfCnpj     String   @unique @map("cpf_cnpj")
+  tipo        Tipo     @default(FISICA)
+  email       String
+  telefone    String
+  cep         String
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  uf          String
+  observacoes String?
+  status      Status   @default(ATIVO)
+  criadoEm    DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@index([status])
+  @@index([email])
+  @@map("cadastros")
+}

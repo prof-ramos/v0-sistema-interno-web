@@ -3,10 +3,10 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
-const databaseUrl = process.env["DATABASE_URL"];
+const databaseUrl = process.env["POSTGRES_PRISMA_URL"] ?? process.env["DATABASE_URL"] ?? process.env["POSTGRES_URL_NON_POOLING"];
 
 if (!databaseUrl) {
-  throw new Error("A variável de ambiente DATABASE_URL não foi definida. Certifique-se de configurar o arquivo .env.");
+  throw new Error("POSTGRES_PRISMA_URL ou DATABASE_URL não definida. Migração/Conexão pode falhar.");
 }
 
 export default defineConfig({

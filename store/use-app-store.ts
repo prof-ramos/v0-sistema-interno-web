@@ -187,7 +187,7 @@ export const useAppStore = create<AppStore>()(
       },
     }),
     {
-      name: 'sistema-interno-storage',
+      name: 'sistema-interno-storage-v2',
       partialize: (state) => ({
         // ⚠ PII Compliance: 
         // 1. Cadastros removidos (persistência no backend Prisma)

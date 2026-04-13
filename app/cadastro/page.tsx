@@ -71,7 +71,7 @@ export default function CadastroPage() {
     return () => controller.abort()
   }, [fetchCadastros])
 
-  const { errors, touched, validateField, validateAll, setTouched, clearErrors, getFieldError } = useValidation({
+  const { touched, validateField, validateAll, setTouched, clearErrors, getFieldError } = useValidation({
     schema: cadastroSchema,
   })
 
@@ -102,14 +102,12 @@ export default function CadastroPage() {
   )
 
   const handleFieldChange = useCallback((field: keyof CadastroForm, value: string) => {
-    setFormData((prev) => {
-      const newData = { ...prev, [field]: value }
-      if (touched[field]) {
-        validateField(field, value, newData)
-      }
-      return newData
-    })
-  }, [touched, validateField])
+    const nextData = { ...formData, [field]: value }
+    setFormData(nextData)
+    if (touched[field]) {
+      validateField(field, value, nextData)
+    }
+  }, [formData, touched, validateField])
 
   const handleFieldBlur = useCallback((field: keyof CadastroForm) => {
     setTouched(field)
@@ -201,6 +199,7 @@ export default function CadastroPage() {
       } catch (error) {
         toast.error('Erro ao excluir cadastro.')
       } finally {
+        setDeleteDialogOpen(false)
         setItemToDelete(null)
       }
     }
@@ -235,7 +234,7 @@ export default function CadastroPage() {
         {/* Form */}
         <div className="lg:col-span-2 space-y-6">
           <SectionCard title="Dados do Cadastro">
-            <form noValidate onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
+            <form noValidate onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
               {/* Dados Principais */}
               <FormSection title="Dados Principais" description="Informações básicas do cadastro">
                 <FormField

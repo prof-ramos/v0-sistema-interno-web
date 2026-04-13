@@ -8,14 +8,13 @@ interface UseValidationOptions<T extends z.ZodRawShape> {
   validateOnChange?: boolean
 }
 
-interface UseValidationReturn<T extends Record<string, any>> {
+interface UseValidationReturn<T extends Record<string, unknown>> {
   errors: Record<string, string>
   touched: Record<string, boolean>
   isValid: boolean
   validateField: (field: keyof T, value: unknown, formData: T) => string | null
   validateAll: (data: T) => boolean
   setTouched: (field: keyof T) => void
-  setAllTouched: () => void
   clearErrors: () => void
   clearField: (field: keyof T) => void
   getFieldError: (field: keyof T) => string | undefined
@@ -26,7 +25,7 @@ interface UseValidationReturn<T extends Record<string, any>> {
  * Hook de validação unificado com Zod.
  * Substitui a implementação customizada anterior.
  */
-export function useValidation<T extends Record<string, any>>(
+export function useValidation<T extends Record<string, unknown>>(
   options: { schema: z.ZodType<T>, validateOnChange?: boolean }
 ): UseValidationReturn<T> {
   const { schema, validateOnChange = true } = options
@@ -113,16 +112,7 @@ export function useValidation<T extends Record<string, any>>(
   const setTouched = useCallback((field: keyof T) => {
     setTouchedState((prev) => ({ ...prev, [field]: true }))
   }, [])
-  
-  const setAllTouched = useCallback(() => {
-    setTouchedState((prev) => {
-      const next: Record<string, boolean> = { ...prev }
-      // This is a bit limited for all-touched without a known list of fields,
-      // but usually validateAll handles this.
-      return next
-    })
-  }, [])
-  
+
   const clearErrors = useCallback(() => {
     setErrors({})
     setTouchedState({})
@@ -168,7 +158,6 @@ export function useValidation<T extends Record<string, any>>(
     validateField,
     validateAll,
     setTouched,
-    setAllTouched,
     clearErrors,
     clearField,
     getFieldError,

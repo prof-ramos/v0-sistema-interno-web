@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { cadastroSchema } from '@/lib/validations'
-import { z } from 'zod'
 
 /**
  * GET /api/cadastros
@@ -11,8 +10,10 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')?.trim()
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
-    const perPage = Math.min(100, Math.max(1, parseInt(searchParams.get('perPage') || '10')))
+    const rawPage = parseInt(searchParams.get('page') || '1')
+    const page = Number.isNaN(rawPage) ? 1 : Math.max(1, rawPage)
+    const rawPerPage = parseInt(searchParams.get('perPage') || '10')
+    const perPage = Number.isNaN(rawPerPage) ? 10 : Math.min(100, Math.max(1, rawPerPage))
 
     const where = search
       ? {

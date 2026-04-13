@@ -84,11 +84,24 @@ export const STATUS_DOCUMENTO_LABELS = {
   ARQUIVADO: 'Arquivado',
 }
 
+export const DOCUMENTO_STATUS_COLORS = {
+  RASCUNHO: 'bg-muted text-muted-foreground',
+  FINALIZADO: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
+  ENVIADO: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
+  ARQUIVADO: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
+}
+
 export const STATUS_CADASTRO_LABELS = {
   ATIVO: 'Ativo',
   INATIVO: 'Inativo',
   PENDENTE: 'Pendente',
 } as const
+
+export const CADASTRO_STATUS_COLORS = {
+  ATIVO: 'bg-success/15 text-success border-success/30 dark:bg-success/10 dark:text-success',
+  INATIVO: 'bg-slate-100 text-slate-800 border-slate-200/50 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800/50',
+  PENDENTE: 'bg-warning/15 text-warning border-warning/30 dark:bg-warning/10 dark:text-warning',
+}
 
 export const UF_OPTIONS = [
   { value: 'AC', label: 'Acre' },

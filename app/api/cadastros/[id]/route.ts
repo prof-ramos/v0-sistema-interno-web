@@ -41,7 +41,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     const validation = cadastroSchema.partial().safeParse(body)
-    if (!validation.success) {
+    if (!validation.success || Object.keys(validation.data).length === 0) {
       return NextResponse.json(
         { error: 'Dados inválidos', details: validation.error.flatten().fieldErrors },
         { status: 400 }

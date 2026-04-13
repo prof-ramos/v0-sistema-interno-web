@@ -19,8 +19,8 @@ const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
   "clientVersion": "7.7.0",
   "engineVersion": "75cbdc1eb7150937890ad5465d861175c6624711",
-  "activeProvider": "sqlite",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../lib/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n}\n\nenum Tipo {\n  FISICA\n  JURIDICA\n}\n\nenum Status {\n  ATIVO\n  INATIVO\n  PENDENTE\n}\n\n/// Cadastro de Pessoa Física ou Jurídica\nmodel Cadastro {\n  id           String   @id @default(cuid())\n  nome         String\n  cpfCnpj      String   @unique @map(\"cpf_cnpj\")\n  tipo         Tipo     @default(FISICA)\n  email        String\n  telefone     String\n  cep          String\n  logradouro   String\n  numero       String\n  complemento  String?\n  bairro       String\n  cidade       String\n  uf           String\n  observacoes  String?\n  status       Status   @default(ATIVO)\n  criadoEm     DateTime @default(now()) @map(\"criado_em\")\n  atualizadoEm DateTime @updatedAt @map(\"atualizado_em\")\n\n  @@index([status])\n  @@index([email])\n  @@map(\"cadastros\")\n}\n",
+  "activeProvider": "postgresql",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../lib/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nenum Tipo {\n  FISICA\n  JURIDICA\n}\n\nenum Status {\n  ATIVO\n  INATIVO\n  PENDENTE\n}\n\n/// Cadastro de Pessoa Física ou Jurídica\nmodel Cadastro {\n  id           String   @id @default(cuid())\n  nome         String\n  cpfCnpj      String   @unique @map(\"cpf_cnpj\")\n  tipo         Tipo     @default(FISICA)\n  email        String\n  telefone     String\n  cep          String\n  logradouro   String\n  numero       String\n  complemento  String?\n  bairro       String\n  cidade       String\n  uf           String\n  observacoes  String?\n  status       Status   @default(ATIVO)\n  criadoEm     DateTime @default(now()) @map(\"criado_em\")\n  atualizadoEm DateTime @updatedAt @map(\"atualizado_em\")\n\n  @@index([status])\n  @@index([email])\n  @@map(\"cadastros\")\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -45,10 +45,10 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.sqlite.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.mjs"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.sqlite.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.mjs")
     return await decodeBase64AsWasm(wasm)
   },
 

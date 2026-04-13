@@ -1344,6 +1344,7 @@ export type CadastroCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data used to create many Cadastros.
    */
   data: Prisma.CadastroCreateManyInput | Prisma.CadastroCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1362,6 +1363,7 @@ export type CadastroCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * The data used to create many Cadastros.
    */
   data: Prisma.CadastroCreateManyInput | Prisma.CadastroCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

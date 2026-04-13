@@ -39,3 +39,4 @@ prisma/dev.db
 prisma/dev.db-journal
 # Antigravity (Assistant local metadata)
 .antigravity/
+.vercel

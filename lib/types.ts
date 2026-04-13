@@ -38,8 +38,8 @@ export type CadastroForm = Omit<Cadastro, 'id' | 'criadoEm' | 'atualizadoEm'>
 
 // ===== SOLICITAÇÃO =====
 
-export type StatusSolicitacao = 'pendente' | 'em_analise' | 'aprovada' | 'rejeitada' | 'concluida'
-export type Prioridade = 'baixa' | 'media' | 'alta' | 'urgente'
+export type StatusSolicitacao = 'PENDENTE' | 'EM_ANALISE' | 'APROVADA' | 'REJEITADA' | 'CONCLUIDA'
+export type Prioridade = 'BAIXA' | 'MEDIA' | 'ALTA' | 'URGENTE'
 
 export interface Solicitacao extends BaseEntity {
   titulo: string
@@ -59,7 +59,7 @@ export type SolicitacaoForm = Omit<Solicitacao, 'id' | 'criadoEm' | 'atualizadoE
 
 // ===== DOCUMENTO =====
 
-export type TipoDocumento = 'oficio' | 'memorando' | 'portaria' | 'decreto' | 'contrato' | 'outro'
+export type TipoDocumento = 'OFICIO' | 'MEMORANDO' | 'PORTARIA' | 'DECRETO' | 'CONTRATO' | 'OUTRO'
 
 export interface Documento extends BaseEntity {
   numero: string
@@ -70,7 +70,7 @@ export interface Documento extends BaseEntity {
   remetente: string
   assunto: string
   dataDocumento: string
-  status: 'rascunho' | 'finalizado' | 'enviado' | 'arquivado'
+  status: 'RASCUNHO' | 'FINALIZADO' | 'ENVIADO' | 'ARQUIVADO'
   anexos?: string[]
 }
 

@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 const emailSchema = z.string().email('E-mail inválido')
 
-const cpfSchema = z.string().refine((val) => {
+export const cpfSchema = z.string().refine((val) => {
   const clean = val.replace(/\D/g, '')
   if (clean.length !== 11) return false
   if (/^(\d)\1{10}$/.test(clean)) return false
@@ -22,7 +22,7 @@ const cpfSchema = z.string().refine((val) => {
   return digit === parseInt(clean[10])
 }, 'CPF inválido')
 
-const cnpjSchema = z.string().refine((val) => {
+export const cnpjSchema = z.string().refine((val) => {
   const clean = val.replace(/\D/g, '')
   if (clean.length !== 14) return false
   if (/^(\d)\1{13}$/.test(clean)) return false
@@ -41,7 +41,7 @@ const cnpjSchema = z.string().refine((val) => {
   return digit === parseInt(clean[13])
 }, 'CNPJ inválido')
 
-const cpfOrCnpjSchema = z.string().refine((val) => {
+export const cpfOrCnpjSchema = z.string().refine((val) => {
   const clean = val.replace(/\D/g, '')
   if (clean.length === 11) {
     // Basic check for CPF

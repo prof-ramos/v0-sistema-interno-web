@@ -10,8 +10,8 @@ interface RouteParams {
  * GET /api/cadastros/[id]
  */
 export async function GET(_request: Request, { params }: RouteParams) {
-  const { id } = await params
   try {
+    const { id } = await params
     const cadastro = await prisma.cadastro.findUnique({
       where: { id },
     })
@@ -22,7 +22,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
     return NextResponse.json(cadastro)
   } catch (error) {
-    console.error(`[GET /api/cadastros/${id}] Unexpected error:`, error)
+    console.error('[GET /api/cadastros/[id]] Unexpected error:', error)
     return NextResponse.json({ error: 'Erro ao buscar cadastro' }, { status: 500 })
   }
 }
@@ -31,8 +31,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
  * PUT /api/cadastros/[id]
  */
 export async function PUT(request: Request, { params }: RouteParams) {
-  const { id } = await params
   try {
+    const { id } = await params
     let body
     try {
       body = await request.json()
@@ -61,18 +61,19 @@ export async function PUT(request: Request, { params }: RouteParams) {
     })
 
     return NextResponse.json(cadastro)
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const prismaError = error as { code?: string; meta?: { target?: string[] } }
     // P2025: Record to update not found
-    if (error.code === 'P2025') {
+    if (prismaError.code === 'P2025') {
       return NextResponse.json({ error: 'Cadastro não encontrado' }, { status: 404 })
     }
 
     // P2002: Unique constraint violation
-    if (error.code === 'P2002') {
+    if (prismaError.code === 'P2002') {
       return NextResponse.json({ error: 'CPF/CNPJ ou E-mail já cadastrado' }, { status: 409 })
     }
 
-    console.error(`[PUT /api/cadastros/${id}] Unexpected error:`, error)
+    console.error('[PUT /api/cadastros/[id]] Unexpected error:', error)
     return NextResponse.json({ error: 'Erro ao atualizar cadastro' }, { status: 500 })
   }
 }
@@ -81,20 +82,21 @@ export async function PUT(request: Request, { params }: RouteParams) {
  * DELETE /api/cadastros/[id]
  */
 export async function DELETE(_request: Request, { params }: RouteParams) {
-  const { id } = await params
   try {
+    const { id } = await params
     await prisma.cadastro.delete({
       where: { id },
     })
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const prismaError = error as { code?: string }
     // P2025: Record to delete not found
-    if (error.code === 'P2025') {
+    if (prismaError.code === 'P2025') {
       return NextResponse.json({ error: 'Cadastro não encontrado' }, { status: 404 })
     }
 
-    console.error(`[DELETE /api/cadastros/${id}] Unexpected error:`, error)
+    console.error('[DELETE /api/cadastros/[id]] Unexpected error:', error)
     return NextResponse.json({ error: 'Erro ao excluir cadastro' }, { status: 500 })
   }
 }

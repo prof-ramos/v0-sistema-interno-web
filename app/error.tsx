@@ -15,7 +15,15 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
   const router = useRouter()
 
   useEffect(() => {
-    reportError(error, { component: 'GlobalError' })
+    // reportError retorna uma Promise no nosso sistema interno, precisa ser engolida ou logada
+    const report = async () => {
+      try {
+        await reportError(error, { component: 'GlobalError' })
+      } catch (err) {
+        console.error('Falha ao reportar o erro originário para o sistema de logs:', err)
+      }
+    }
+    report()
   }, [error])
 
   return (

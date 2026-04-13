@@ -98,10 +98,11 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(cadastro, { status: 201 })
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle Prisma specific errors
-    if (error.code === 'P2002') {
-      const target = error.meta?.target || []
+    const prismaError = error as { code?: string; meta?: { target?: string[] } }
+    if (prismaError.code === 'P2002') {
+      const target = prismaError.meta?.target || []
       return NextResponse.json(
         { error: `Conflito: ${target.includes('cpfCnpj') ? 'CPF/CNPJ' : 'E-mail'} já cadastrado` },
         { status: 409 }

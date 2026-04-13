@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { createDataSnapshot } from '../hooks/use-debounce.ts'
+import { createDataSnapshot } from '../hooks/use-debounce'
 
 test('createDataSnapshot is stable for objects with different key order', () => {
   const first = createDataSnapshot({ b: 2, a: 1, nested: { d: 4, c: 3 } })

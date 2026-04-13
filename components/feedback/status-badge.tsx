@@ -51,15 +51,15 @@ export function PrioridadeBadge({ prioridade, className }: PrioridadeBadgeProps)
 }
 
 interface DocumentoStatusBadgeProps {
-  status: 'rascunho' | 'finalizado' | 'enviado' | 'arquivado'
+  status: 'RASCUNHO' | 'FINALIZADO' | 'ENVIADO' | 'ARQUIVADO'
   className?: string
 }
 
 const DOCUMENTO_STATUS_COLORS = {
-  rascunho: 'bg-muted text-muted-foreground',
-  finalizado: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
-  enviado: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
-  arquivado: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
+  RASCUNHO: 'bg-muted text-muted-foreground',
+  FINALIZADO: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
+  ENVIADO: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
+  ARQUIVADO: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
 }
 
 export function DocumentoStatusBadge({ status, className }: DocumentoStatusBadgeProps) {

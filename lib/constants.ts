@@ -39,49 +39,49 @@ export const NAV_ITEMS: NavItem[] = [
 // ===== LABELS =====
 
 export const STATUS_SOLICITACAO_LABELS: Record<StatusSolicitacao, string> = {
-  pendente: 'Pendente',
-  em_analise: 'Em Análise',
-  aprovada: 'Aprovada',
-  rejeitada: 'Rejeitada',
-  concluida: 'Concluída',
+  PENDENTE: 'Pendente',
+  EM_ANALISE: 'Em Análise',
+  APROVADA: 'Aprovada',
+  REJEITADA: 'Rejeitada',
+  CONCLUIDA: 'Concluída',
 }
 
 export const STATUS_SOLICITACAO_COLORS: Record<StatusSolicitacao, string> = {
-  pendente: 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400',
-  em_analise: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-  aprovada: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
-  rejeitada: 'bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive/80',
-  concluida: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+  PENDENTE: 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400',
+  EM_ANALISE: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
+  APROVADA: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
+  REJEITADA: 'bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive/80',
+  CONCLUIDA: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
 }
 
 export const PRIORIDADE_LABELS: Record<Prioridade, string> = {
-  baixa: 'Baixa',
-  media: 'Média',
-  alta: 'Alta',
-  urgente: 'Urgente',
+  BAIXA: 'Baixa',
+  MEDIA: 'Média',
+  ALTA: 'Alta',
+  URGENTE: 'Urgente',
 }
 
 export const PRIORIDADE_COLORS: Record<Prioridade, string> = {
-  baixa: 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-400',
-  media: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  alta: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-  urgente: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  BAIXA: 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-400',
+  MEDIA: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  ALTA: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+  URGENTE: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 }
 
 export const TIPO_DOCUMENTO_LABELS: Record<TipoDocumento, string> = {
-  oficio: 'Ofício',
-  memorando: 'Memorando',
-  portaria: 'Portaria',
-  decreto: 'Decreto',
-  contrato: 'Contrato',
-  outro: 'Outro',
+  OFICIO: 'Ofício',
+  MEMORANDO: 'Memorando',
+  PORTARIA: 'Portaria',
+  DECRETO: 'Decreto',
+  CONTRATO: 'Contrato',
+  OUTRO: 'Outro',
 }
 
 export const STATUS_DOCUMENTO_LABELS = {
-  rascunho: 'Rascunho',
-  finalizado: 'Finalizado',
-  enviado: 'Enviado',
-  arquivado: 'Arquivado',
+  RASCUNHO: 'Rascunho',
+  FINALIZADO: 'Finalizado',
+  ENVIADO: 'Enviado',
+  ARQUIVADO: 'Arquivado',
 }
 
 export const STATUS_CADASTRO_LABELS = {

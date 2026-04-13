@@ -2,40 +2,37 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
-  cpf,
-  cnpj,
-  cpfOrCnpj,
+  cpfSchema,
+  cnpjSchema,
+  cpfOrCnpjSchema,
   maskCPFOrCNPJ,
   maskPhone,
-  validate,
-  required,
-} from '../lib/validations.ts'
+  cadastroSchema
+} from '../lib/validations'
 
-test('cpf validation accepts valid CPF and rejects invalid ones', () => {
-  assert.equal(cpf().validate('529.982.247-25'), true)
-  assert.equal(cpf().validate('52998224725'), true)
-  assert.equal(cpf().validate('111.111.111-11'), false)
-  assert.equal(cpf().validate('123.456.789-00'), false)
-  assert.equal(cpf().validate(''), false)
-  assert.equal(cpf().validate(undefined as unknown as string), false)
-  assert.equal(cpf().validate('529.982.247-25abc'), false)
+test('cpfSchema accepts valid CPF and rejects invalid ones', () => {
+  assert.equal(cpfSchema.safeParse('529.982.247-25').success, true)
+  assert.equal(cpfSchema.safeParse('52998224725').success, true)
+  assert.equal(cpfSchema.safeParse('111.111.111-11').success, false)
+  assert.equal(cpfSchema.safeParse('123.456.789-00').success, false)
+  assert.equal(cpfSchema.safeParse('').success, false)
+  assert.equal(cpfSchema.safeParse('529.982.247-25abc').success, false)
 })
 
-test('cnpj validation accepts valid CNPJ and rejects invalid ones', () => {
-  assert.equal(cnpj().validate('45.723.174/0001-10'), true)
-  assert.equal(cnpj().validate('45723174000110'), true)
-  assert.equal(cnpj().validate('11.111.111/1111-11'), false)
-  assert.equal(cnpj().validate('1234567890123'), false)
-  assert.equal(cnpj().validate('45.723.174/0001-10abc'), false)
-  assert.equal(cnpj().validate('00.000.000/0000-00'), false)
-  assert.equal(cnpj().validate(''), false)
-  assert.equal(cnpj().validate(null as unknown as string), false)
+test('cnpjSchema accepts valid CNPJ and rejects invalid ones', () => {
+  assert.equal(cnpjSchema.safeParse('45.723.174/0001-10').success, true)
+  assert.equal(cnpjSchema.safeParse('45723174000110').success, true)
+  assert.equal(cnpjSchema.safeParse('11.111.111/1111-11').success, false)
+  assert.equal(cnpjSchema.safeParse('1234567890123').success, false)
+  assert.equal(cnpjSchema.safeParse('45.723.174/0001-10abc').success, false)
+  assert.equal(cnpjSchema.safeParse('00.000.000/0000-00').success, false)
+  assert.equal(cnpjSchema.safeParse('').success, false)
 })
 
-test('cpfOrCnpj delegates based on cleaned length', () => {
-  assert.equal(cpfOrCnpj().validate('529.982.247-25'), true)
-  assert.equal(cpfOrCnpj().validate('45.723.174/0001-10'), true)
-  assert.equal(cpfOrCnpj().validate('123'), false)
+test('cpfOrCnpjSchema delegates based on cleaned length', () => {
+  assert.equal(cpfOrCnpjSchema.safeParse('529.982.247-25').success, true)
+  assert.equal(cpfOrCnpjSchema.safeParse('45.723.174/0001-10').success, true)
+  assert.equal(cpfOrCnpjSchema.safeParse('123').success, false)
 })
 
 test('mask helpers format CPF/CNPJ and phone values', () => {
@@ -44,32 +41,25 @@ test('mask helpers format CPF/CNPJ and phone values', () => {
   assert.equal(maskPhone('11999998888'), '(11) 99999-8888')
 })
 
-test('validate returns first error per field and keeps valid fields clean', () => {
-  const result = validate(
-    { nome: '  ', email: 'ok@example.com' },
-    {
-      nome: [required('Nome obrigatório')],
-      email: [required('E-mail obrigatório')],
-    }
-  )
-
-  assert.equal(result.isValid, false)
-  assert.deepEqual(result.errors, [{ field: 'nome', message: 'Nome obrigatório' }])
-})
-
-test('validate returns errors for multiple invalid fields', () => {
-  const result = validate(
-    { nome: '', email: '' },
-    {
-      nome: [required('Nome obrigatório')],
-      email: [required('E-mail obrigatório')],
-    }
-  )
-
-  assert.equal(result.isValid, false)
-  assert.equal(result.errors.length, 2)
-  assert.deepEqual(result.errors, [
-    { field: 'nome', message: 'Nome obrigatório' },
-    { field: 'email', message: 'E-mail obrigatório' },
-  ])
+test('cadastroSchema validates correctly and rejects missing mandatory fields', () => {
+  const payloadInvalid = { nome: '  ', email: 'ok@example.com' }
+  const resultInvalid = cadastroSchema.safeParse(payloadInvalid)
+  assert.equal(resultInvalid.success, false)
+  
+  const payloadValid = {
+    nome: 'Gabriel',
+    cpfCnpj: '529.982.247-25',
+    tipo: 'FISICA',
+    email: 'gabriel@example.com',
+    telefone: '(11) 99999-8888',
+    cep: '00000-000',
+    logradouro: 'Rua A',
+    numero: '123',
+    bairro: 'Centro',
+    cidade: 'SP',
+    uf: 'SP',
+    status: 'ATIVO'
+  }
+  const resultValid = cadastroSchema.safeParse(payloadValid)
+  assert.equal(resultValid.success, true)
 })

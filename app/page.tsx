@@ -65,7 +65,7 @@ export default function DashboardPage() {
   }, [fetchCadastros])
 
   const pendentes = useMemo(
-    () => solicitacoes.filter((s: Solicitacao) => s.status === 'pendente'),
+    () => solicitacoes.filter((s: Solicitacao) => s.status === 'PENDENTE'),
     [solicitacoes]
   )
 
@@ -84,7 +84,7 @@ export default function DashboardPage() {
       icon: FileText,
       href: ROUTES.SOLICITACOES,
       color: 'text-primary bg-primary/10 border-primary/20',
-      detail: `${solicitacoes.filter((item) => item.status === 'concluida').length} concluídas`,
+      detail: `${solicitacoes.filter((item) => item.status === 'CONCLUIDA').length} concluídas`,
     },
     {
       label: 'Documentos',
@@ -92,7 +92,7 @@ export default function DashboardPage() {
       icon: FolderOpen,
       href: ROUTES.DOCUMENTOS,
       color: 'text-primary bg-primary/10 border-primary/20',
-      detail: `${documentos.filter((item) => item.status === 'finalizado').length} finalizados`,
+      detail: `${documentos.filter((item) => item.status === 'FINALIZADO').length} finalizados`,
     },
     {
       label: 'Pendentes',
@@ -100,7 +100,7 @@ export default function DashboardPage() {
       icon: Clock,
       href: ROUTES.SOLICITACOES,
       color: 'text-amber-700 bg-amber-50 dark:bg-amber-900/20 border-amber-200',
-      detail: `${pendentes.filter((s) => s.prioridade === 'urgente').length} urgentes`,
+      detail: `${pendentes.filter((s) => s.prioridade === 'URGENTE').length} urgentes`,
     },
   ], [localCadastros, solicitacoes, documentos, pendentes])
 

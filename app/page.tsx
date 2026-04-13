@@ -51,10 +51,11 @@ export default function DashboardPage() {
   const fetchCadastros = useCallback(async () => {
     try {
       const resp = await fetch('/api/cadastros')
-      if (resp.ok) {
-        const data = await resp.json()
-        setLocalCadastros(data)
-      }
+      if (!resp.ok) throw new Error('Erro ao carregar cadastros')
+      const result = await resp.json()
+      setLocalCadastros(Array.isArray(result) ? result : result.data || [])
+    } catch {
+      setLocalCadastros([])
     } finally {
       setLoadingCadastros(false)
     }
@@ -131,19 +132,22 @@ export default function DashboardPage() {
               href={stat.href}
               aria-label={`Ver ${stat.label}: ${stat.value}`}
             >
-              <Card className="transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-lg hover:-translate-y-2 hover:border-primary/20 rounded-sm">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-                      <p className="text-4xl font-serif font-bold">{stat.value}</p>
-                    </div>
-                    <div className={cn('rounded-sm p-2 border', stat.color)}>
-                      <stat.icon className="size-6" />
+              <Card className="transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 rounded-lg flex flex-col justify-between">
+                <CardContent className="p-6 flex-1 flex flex-col">
+                  <div className="flex items-start justify-between mb-4">
+                    <p className="text-base font-medium text-muted-foreground">{stat.label}</p>
+                    <div className={cn('rounded-md p-3 border', stat.color)}>
+                      <stat.icon className="size-5" />
                     </div>
                   </div>
-                  <div className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <span>{stat.detail}</span>
+                  
+                  <div className="space-y-2 mt-auto">
+                    <p className="text-5xl font-sans font-bold tracking-tight text-foreground">{stat.value}</p>
+                    <div className="flex items-center text-sm font-medium text-muted-foreground">
+                      <span className="bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-sm">
+                        {stat.detail}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

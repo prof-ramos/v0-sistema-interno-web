@@ -1,55 +1,82 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-/**
- * Hook para debounce de valores
- */
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+function normalizeDataSnapshot(value: unknown, ancestors = new WeakSet<object>()): string {
+  if (value === null || typeof value !== 'object') {
+    return JSON.stringify(value)
+  }
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
+  // Guard against circular references (track only ancestor chain, not all visited)
+  if (ancestors.has(value as object)) {
+    return '"[Circular]"'
+  }
+  ancestors.add(value as object)
 
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
+  let result: string
 
-  return debouncedValue
+  if (Array.isArray(value)) {
+    result = `[${value.map((item) => normalizeDataSnapshot(item, ancestors)).join(',')}]`
+  } else {
+    const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) =>
+      a.localeCompare(b)
+    )
+    result = `{${entries
+      .map(([key, entryValue]) => `${JSON.stringify(key)}:${normalizeDataSnapshot(entryValue, ancestors)}`)
+      .join(',')}}`
+  }
+
+  // Remove from ancestor chain after processing (shared refs are OK, only cycles are flagged)
+  ancestors.delete(value as object)
+
+  return result
 }
+
+export function createDataSnapshot<T>(value: T): string {
+  return normalizeDataSnapshot(value)
+}
+
+type DebouncedArgs = unknown[]
 
 /**
  * Hook para debounce de callbacks
  */
-export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
-  callback: T,
-  delay: number
-): (...args: Parameters<T>) => void {
+function useDebouncedCallback<Args extends DebouncedArgs>(
+  callback: (...args: Args) => void | Promise<void>,
+  delay: number,
+  onError?: (err: unknown) => void
+): (...args: Args) => void {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const callbackRef = useRef(callback)
+  const onErrorRef = useRef(onError)
   
-  // Atualiza a referência do callback
   useEffect(() => {
     callbackRef.current = callback
   }, [callback])
   
+  useEffect(() => {
+    onErrorRef.current = onError
+  }, [onError])
+  
   const debouncedCallback = useCallback(
-    (...args: Parameters<T>) => {
+    (...args: Args) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
       
       timeoutRef.current = setTimeout(() => {
-        callbackRef.current(...args)
+        const promise = callbackRef.current(...args)
+        if (promise instanceof Promise) {
+          promise.catch((err) => {
+            console.error('[useDebouncedCallback] Unhandled rejection:', err)
+            onErrorRef.current?.(err)
+          })
+        }
       }, delay)
     },
     [delay]
   )
   
-  // Cleanup no unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -66,35 +93,57 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
  */
 export function useAutoSave<T>(
   data: T,
-  onSave: (data: T) => void,
+  onSave: (data: T) => void | Promise<void>,
   delay: number = 1000,
   enabled: boolean = true
 ) {
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
-  const previousDataRef = useRef<T>(data)
+  const [saveError, setSaveError] = useState<unknown>(null)
+  const previousSnapshotRef = useRef(createDataSnapshot(data))
+  const currentSnapshot = useMemo(() => createDataSnapshot(data), [data])
   
-  const debouncedSave = useDebouncedCallback((newData: T) => {
-    setIsSaving(true)
-    onSave(newData)
-    setLastSaved(new Date())
-    setIsSaving(false)
-  }, delay)
+  const handleSaveError = useCallback((err: unknown) => {
+    setSaveError(err)
+    // setIsSaving(false) is handled by debouncedSave's finally block — no redundant call
+  }, [])
+
+  const savingRef = useRef(false)
+
+  const debouncedSave = useDebouncedCallback(async (newData: T, snapshot: string) => {
+    // Mutex: skip if another save is already in flight
+    if (savingRef.current) return
+    savingRef.current = true
+    try {
+      setSaveError(null)
+      await onSave(newData)
+      previousSnapshotRef.current = snapshot
+      setLastSaved(new Date())
+    } finally {
+      savingRef.current = false
+      setIsSaving(false)
+    }
+  }, delay, handleSaveError)
   
   useEffect(() => {
-    if (!enabled) return
-    
-    // Verifica se os dados mudaram
-    const hasChanged = JSON.stringify(data) !== JSON.stringify(previousDataRef.current)
+    if (!enabled) {
+      // Don't reset previousSnapshotRef when disabled — let changes accumulate
+      // so they'll be detected when enabled flips back to true
+      setIsSaving(false)
+      return
+    }
+
+    const hasChanged = currentSnapshot !== previousSnapshotRef.current
     
     if (hasChanged) {
-      previousDataRef.current = data
-      debouncedSave(data)
+      setIsSaving(true)
+      debouncedSave(data, currentSnapshot)
     }
-  }, [data, debouncedSave, enabled])
+  }, [currentSnapshot, data, debouncedSave, enabled])
   
   return {
     isSaving,
     lastSaved,
+    saveError,
   }
 }

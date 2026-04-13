@@ -1,76 +1,109 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useState, useMemo, useEffect, useSyncExternalStore, useCallback } from 'react'
 import Link from 'next/link'
-import { 
-  Users, 
-  FileText, 
-  FolderOpen, 
-  TrendingUp,
-  TrendingDown,
-  Plus,
+import {
+  Users,
+  FileText,
+  FolderOpen,
   Clock,
   ArrowRight,
 } from 'lucide-react'
 import { PageHeader, SectionCard } from '@/components/layout'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { StatusBadge, PrioridadeBadge } from '@/components/feedback'
 import { useAppStore } from '@/store/use-app-store'
 import { ROUTES } from '@/lib/constants'
+import type { Cadastro, Solicitacao } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
-const getTrendStyles = (change: string) => {
-  const isPositive = change.startsWith('+');
-  return {
-    isPositive,
-    colorClass: isPositive ? 'text-green-600' : 'text-red-600',
-    Icon: isPositive ? TrendingUp : TrendingDown,
-  };
-};
+const CARD_SKELETON_HEIGHT = 'h-[132px]'
 
-const TrendIndicator = ({ change }: { change: string }) => {
-  const { colorClass, Icon } = getTrendStyles(change);
-  return <Icon className={cn('size-3', colorClass)} />;
-};
+const quickActions = [
+  { label: 'Novo Cadastro', href: ROUTES.CADASTRO, icon: Users },
+  { label: 'Nova Solicitação', href: ROUTES.SOLICITACOES, icon: FileText },
+  { label: 'Novo Documento', href: ROUTES.DOCUMENTOS, icon: FolderOpen },
+] as const
+
+function subscribeToStoreHydration(callback: () => void) {
+  const unsubscribeHydrate = useAppStore.persist.onHydrate(callback)
+  const unsubscribeFinishHydration = useAppStore.persist.onFinishHydration(callback)
+
+  return () => {
+    unsubscribeHydrate()
+    unsubscribeFinishHydration()
+  }
+}
 
 export default function DashboardPage() {
-  const { cadastros, solicitacoes, documentos } = useAppStore()
+  const { solicitacoes, documentos } = useAppStore()
+  const [localCadastros, setLocalCadastros] = useState<Cadastro[]>([])
+  const [loadingCadastros, setLoadingCadastros] = useState(true)
+
+  const mounted = useSyncExternalStore(
+    subscribeToStoreHydration,
+    () => useAppStore.persist.hasHydrated(),
+    () => false
+  )
+
+  const fetchCadastros = useCallback(async () => {
+    try {
+      const resp = await fetch('/api/cadastros')
+      if (!resp.ok) throw new Error('Erro ao carregar cadastros')
+      const result = await resp.json()
+      setLocalCadastros(Array.isArray(result) ? result : result.data || [])
+    } catch {
+      setLocalCadastros([])
+    } finally {
+      setLoadingCadastros(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchCadastros()
+  }, [fetchCadastros])
+
+  const pendentes = useMemo(
+    () => solicitacoes.filter((s: Solicitacao) => s.status === 'PENDENTE'),
+    [solicitacoes]
+  )
 
   const stats = useMemo(() => [
     {
       label: 'Cadastros',
-      value: cadastros.length,
+      value: localCadastros.length,
       icon: Users,
       href: ROUTES.CADASTRO,
-      color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400',
-      change: '+12%',
+      color: 'text-primary bg-primary/10 border-primary/20',
+      detail: `${localCadastros.filter((item: Cadastro) => item.status === 'ATIVO').length} ativos`,
     },
     {
       label: 'Solicitações',
       value: solicitacoes.length,
       icon: FileText,
       href: ROUTES.SOLICITACOES,
-      color: 'text-violet-600 bg-violet-100 dark:bg-violet-900/30 dark:text-violet-400',
-      change: '+8%',
+      color: 'text-primary bg-primary/10 border-primary/20',
+      detail: `${solicitacoes.filter((item) => item.status === 'CONCLUIDA').length} concluídas`,
     },
     {
       label: 'Documentos',
       value: documentos.length,
       icon: FolderOpen,
       href: ROUTES.DOCUMENTOS,
-      color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400',
-      change: '+15%',
+      color: 'text-primary bg-primary/10 border-primary/20',
+      detail: `${documentos.filter((item) => item.status === 'FINALIZADO').length} finalizados`,
     },
     {
       label: 'Pendentes',
-      value: solicitacoes.filter(s => s.status === 'pendente').length,
+      value: pendentes.length,
       icon: Clock,
       href: ROUTES.SOLICITACOES,
-      color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400',
-      change: '-5%',
+      color: 'text-amber-700 bg-amber-50 dark:bg-amber-900/20 border-amber-200',
+      detail: `${pendentes.filter((s) => s.prioridade === 'URGENTE').length} urgentes`,
     },
-  ], [cadastros, solicitacoes, documentos])
+  ], [localCadastros, solicitacoes, documentos, pendentes])
 
   const recentSolicitacoes = useMemo(() => 
     [...solicitacoes]
@@ -78,12 +111,6 @@ export default function DashboardPage() {
       .slice(0, 5),
     [solicitacoes]
   )
-
-  const quickActions = [
-    { label: 'Novo Cadastro', href: ROUTES.CADASTRO, icon: Users },
-    { label: 'Nova Solicitação', href: ROUTES.SOLICITACOES, icon: FileText },
-    { label: 'Novo Documento', href: ROUTES.DOCUMENTOS, icon: FolderOpen },
-  ]
 
   return (
     <div className="space-y-6">
@@ -93,38 +120,43 @@ export default function DashboardPage() {
       />
 
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Link 
-            key={stat.label} 
-            href={stat.href}
-            aria-label={`Ver ${stat.label}: ${stat.value}`}
-          >
-            <Card className="transition-all hover:shadow-md hover:border-primary/20">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
-                    <p className="text-2xl font-semibold">{stat.value}</p>
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {!mounted || loadingCadastros ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className={`${CARD_SKELETON_HEIGHT} w-full rounded-sm`} />
+          ))
+        ) : (
+          stats.map((stat) => (
+            <Link 
+              key={stat.label} 
+              href={stat.href}
+              aria-label={`Ver ${stat.label}: ${stat.value}`}
+            >
+              <Card className="transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 rounded-lg flex flex-col justify-between">
+                <CardContent className="p-6 flex-1 flex flex-col">
+                  <div className="flex items-start justify-between mb-4">
+                    <p className="text-base font-medium text-muted-foreground">{stat.label}</p>
+                    <div className={cn('rounded-md p-3 border', stat.color)}>
+                      <stat.icon className="size-5" />
+                    </div>
                   </div>
-                  <div className={cn('rounded-lg p-2', stat.color)}>
-                    <stat.icon className="size-5" />
+                  
+                  <div className="space-y-2 mt-auto">
+                    <p className="text-5xl font-sans font-bold tracking-tight text-foreground">{stat.value}</p>
+                    <div className="flex items-center text-sm font-medium text-muted-foreground">
+                      <span className="bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-sm">
+                        {stat.detail}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-2 flex items-center gap-1 text-xs">
-                  <TrendIndicator change={stat.change} />
-                  <span className={getTrendStyles(stat.change).colorClass}>
-                    {stat.change}
-                  </span>
-                  <span className="text-muted-foreground">vs mês anterior</span>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+                </CardContent>
+              </Card>
+            </Link>
+          ))
+        )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-8 lg:grid-cols-3">
         {/* Recent Activity */}
         <SectionCard
           title="Solicitações Recentes"
@@ -139,7 +171,13 @@ export default function DashboardPage() {
             </Button>
           }
         >
-          {recentSolicitacoes.length === 0 ? (
+          {!mounted ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-[68px] w-full rounded-lg" />
+              ))}
+            </div>
+          ) : recentSolicitacoes.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">
               Nenhuma solicitação encontrada.
             </p>
@@ -148,13 +186,13 @@ export default function DashboardPage() {
               {recentSolicitacoes.map((solicitacao) => (
                 <div
                   key={solicitacao.id}
-                  className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/50"
+                  className="flex items-center justify-between rounded-sm border p-4 transition-colors hover:bg-muted/50"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-sm">
+                    <p className="truncate font-serif font-bold text-lg">
                       {solicitacao.titulo}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       {solicitacao.solicitanteNome} - {new Date(solicitacao.criadoEm).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
@@ -182,7 +220,7 @@ export default function DashboardPage() {
                 asChild
               >
                 <Link href={action.href} aria-label={`Realizar ${action.label}`}>
-                  <Plus className="mr-2 size-4" />
+                  <action.icon className="mr-2 size-4" />
                   {action.label}
                 </Link>
               </Button>

@@ -9,16 +9,12 @@ import {
 import type { 
   StatusSolicitacao, 
   Prioridade, 
-  TipoDocumento,
-  Cadastro,
-  Solicitacao,
-  Documento,
-  ConfiguracoesApp
+  TipoDocumento
 } from './types'
 
 // ===== ROTAS =====
 
-export interface NavItem {
+interface NavItem {
   label: string
   href: string
   icon: LucideIcon
@@ -43,55 +39,68 @@ export const NAV_ITEMS: NavItem[] = [
 // ===== LABELS =====
 
 export const STATUS_SOLICITACAO_LABELS: Record<StatusSolicitacao, string> = {
-  pendente: 'Pendente',
-  em_analise: 'Em Análise',
-  aprovada: 'Aprovada',
-  rejeitada: 'Rejeitada',
-  concluida: 'Concluída',
+  PENDENTE: 'Pendente',
+  EM_ANALISE: 'Em Análise',
+  APROVADA: 'Aprovada',
+  REJEITADA: 'Rejeitada',
+  CONCLUIDA: 'Concluída',
 }
 
 export const STATUS_SOLICITACAO_COLORS: Record<StatusSolicitacao, string> = {
-  pendente: 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400',
-  em_analise: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-  aprovada: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
-  rejeitada: 'bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive/80',
-  concluida: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+  PENDENTE: 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400',
+  EM_ANALISE: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
+  APROVADA: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
+  REJEITADA: 'bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive/80',
+  CONCLUIDA: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
 }
 
 export const PRIORIDADE_LABELS: Record<Prioridade, string> = {
-  baixa: 'Baixa',
-  media: 'Média',
-  alta: 'Alta',
-  urgente: 'Urgente',
+  BAIXA: 'Baixa',
+  MEDIA: 'Média',
+  ALTA: 'Alta',
+  URGENTE: 'Urgente',
 }
 
 export const PRIORIDADE_COLORS: Record<Prioridade, string> = {
-  baixa: 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-400',
-  media: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  alta: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-  urgente: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  BAIXA: 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-400',
+  MEDIA: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  ALTA: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+  URGENTE: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 }
 
 export const TIPO_DOCUMENTO_LABELS: Record<TipoDocumento, string> = {
-  oficio: 'Ofício',
-  memorando: 'Memorando',
-  portaria: 'Portaria',
-  decreto: 'Decreto',
-  contrato: 'Contrato',
-  outro: 'Outro',
+  OFICIO: 'Ofício',
+  MEMORANDO: 'Memorando',
+  PORTARIA: 'Portaria',
+  DECRETO: 'Decreto',
+  CONTRATO: 'Contrato',
+  OUTRO: 'Outro',
 }
 
 export const STATUS_DOCUMENTO_LABELS = {
-  rascunho: 'Rascunho',
-  finalizado: 'Finalizado',
-  enviado: 'Enviado',
-  arquivado: 'Arquivado',
+  RASCUNHO: 'Rascunho',
+  FINALIZADO: 'Finalizado',
+  ENVIADO: 'Enviado',
+  ARQUIVADO: 'Arquivado',
+}
+
+export const DOCUMENTO_STATUS_COLORS = {
+  RASCUNHO: 'bg-muted text-muted-foreground',
+  FINALIZADO: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
+  ENVIADO: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
+  ARQUIVADO: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
 }
 
 export const STATUS_CADASTRO_LABELS = {
-  ativo: 'Ativo',
-  inativo: 'Inativo',
-  pendente: 'Pendente',
+  ATIVO: 'Ativo',
+  INATIVO: 'Inativo',
+  PENDENTE: 'Pendente',
+} as const
+
+export const CADASTRO_STATUS_COLORS = {
+  ATIVO: 'bg-success/15 text-success border-success/30 dark:bg-success/10 dark:text-success',
+  INATIVO: 'bg-slate-100 text-slate-800 border-slate-200/50 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800/50',
+  PENDENTE: 'bg-warning/15 text-warning border-warning/30 dark:bg-warning/10 dark:text-warning',
 }
 
 export const UF_OPTIONS = [
@@ -123,167 +132,3 @@ export const UF_OPTIONS = [
   { value: 'SE', label: 'Sergipe' },
   { value: 'TO', label: 'Tocantins' },
 ]
-
-// ===== DADOS MOCKADOS =====
-
-export const MOCK_CADASTROS: Cadastro[] = [
-  {
-    id: '1',
-    nome: 'Maria Silva Santos',
-    cpfCnpj: '123.456.789-00',
-    tipo: 'pessoa_fisica',
-    email: 'maria.silva@email.com',
-    telefone: '(11) 99999-8888',
-    cep: '01310-100',
-    logradouro: 'Avenida Paulista',
-    numero: '1000',
-    complemento: 'Sala 101',
-    bairro: 'Bela Vista',
-    cidade: 'São Paulo',
-    uf: 'SP',
-    observacoes: 'Cliente VIP',
-    status: 'ativo',
-    criadoEm: '2024-01-15T10:30:00Z',
-    atualizadoEm: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    nome: 'Tech Solutions LTDA',
-    cpfCnpj: '12.345.678/0001-90',
-    tipo: 'pessoa_juridica',
-    email: 'contato@techsolutions.com.br',
-    telefone: '(11) 3333-4444',
-    cep: '04543-011',
-    logradouro: 'Rua Funchal',
-    numero: '500',
-    bairro: 'Vila Olímpia',
-    cidade: 'São Paulo',
-    uf: 'SP',
-    status: 'ativo',
-    criadoEm: '2024-02-01T14:00:00Z',
-    atualizadoEm: '2024-02-01T14:00:00Z',
-  },
-  {
-    id: '3',
-    nome: 'João Pedro Oliveira',
-    cpfCnpj: '987.654.321-00',
-    tipo: 'pessoa_fisica',
-    email: 'joao.oliveira@email.com',
-    telefone: '(21) 98888-7777',
-    cep: '22041-080',
-    logradouro: 'Rua Barata Ribeiro',
-    numero: '200',
-    bairro: 'Copacabana',
-    cidade: 'Rio de Janeiro',
-    uf: 'RJ',
-    status: 'pendente',
-    criadoEm: '2024-02-10T09:15:00Z',
-    atualizadoEm: '2024-02-10T09:15:00Z',
-  },
-]
-
-export const MOCK_SOLICITACOES: Solicitacao[] = [
-  {
-    id: '1',
-    titulo: 'Solicitação de Férias',
-    descricao: 'Solicitação de férias para o período de 01/03 a 15/03/2024',
-    tipo: 'ferias',
-    solicitanteId: '1',
-    solicitanteNome: 'Maria Silva Santos',
-    status: 'pendente',
-    prioridade: 'media',
-    dataLimite: '2024-02-25',
-    criadoEm: '2024-02-10T10:00:00Z',
-    atualizadoEm: '2024-02-10T10:00:00Z',
-  },
-  {
-    id: '2',
-    titulo: 'Aprovação de Orçamento',
-    descricao: 'Solicito aprovação do orçamento para aquisição de equipamentos de TI',
-    tipo: 'orcamento',
-    solicitanteId: '2',
-    solicitanteNome: 'Tech Solutions LTDA',
-    status: 'em_analise',
-    prioridade: 'alta',
-    responsavelId: '3',
-    responsavelNome: 'Carlos Mendes',
-    dataLimite: '2024-02-20',
-    criadoEm: '2024-02-05T14:30:00Z',
-    atualizadoEm: '2024-02-08T09:00:00Z',
-  },
-  {
-    id: '3',
-    titulo: 'Manutenção Urgente',
-    descricao: 'Necessidade de manutenção emergencial no sistema de ar condicionado',
-    tipo: 'manutencao',
-    solicitanteId: '1',
-    solicitanteNome: 'Maria Silva Santos',
-    status: 'aprovada',
-    prioridade: 'urgente',
-    responsavelId: '4',
-    responsavelNome: 'Roberto Lima',
-    criadoEm: '2024-02-12T08:00:00Z',
-    atualizadoEm: '2024-02-12T10:30:00Z',
-  },
-]
-
-export const MOCK_DOCUMENTOS: Documento[] = [
-  {
-    id: '1',
-    numero: 'OF-001/2024',
-    tipo: 'oficio',
-    titulo: 'Ofício de Comunicação',
-    conteudo: 'Prezado(a) Senhor(a),\n\nVimos por meio deste comunicar...',
-    destinatario: 'Secretaria de Administração',
-    remetente: 'Departamento de RH',
-    assunto: 'Comunicação de Alteração de Horário',
-    dataDocumento: '2024-02-15',
-    status: 'finalizado',
-    criadoEm: '2024-02-15T09:00:00Z',
-    atualizadoEm: '2024-02-15T11:30:00Z',
-  },
-  {
-    id: '2',
-    numero: 'MEM-005/2024',
-    tipo: 'memorando',
-    titulo: 'Memorando Interno',
-    conteudo: 'Informamos que a partir do dia 01/03/2024...',
-    destinatario: 'Todos os Setores',
-    remetente: 'Diretoria Geral',
-    assunto: 'Nova Política de Home Office',
-    dataDocumento: '2024-02-10',
-    status: 'enviado',
-    criadoEm: '2024-02-10T14:00:00Z',
-    atualizadoEm: '2024-02-11T08:00:00Z',
-  },
-  {
-    id: '3',
-    numero: 'PORT-002/2024',
-    tipo: 'portaria',
-    titulo: 'Portaria de Nomeação',
-    conteudo: 'O Diretor Geral, no uso de suas atribuições...',
-    destinatario: 'Departamento Pessoal',
-    remetente: 'Diretoria Geral',
-    assunto: 'Nomeação de Coordenador',
-    dataDocumento: '2024-02-01',
-    status: 'arquivado',
-    criadoEm: '2024-02-01T10:00:00Z',
-    atualizadoEm: '2024-02-05T16:00:00Z',
-  },
-]
-
-export const DEFAULT_CONFIGURACOES: ConfiguracoesApp = {
-  perfil: {
-    nome: 'Usuário do Sistema',
-    email: 'usuario@sistema.gov.br',
-    cargo: 'Analista',
-    setor: 'Administração',
-  },
-  tema: 'system',
-  notificacoes: {
-    email: true,
-    push: true,
-    sms: false,
-  },
-  idioma: 'pt-BR',
-}

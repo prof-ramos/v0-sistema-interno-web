@@ -1,48 +1,61 @@
 'use client'
 
 import { useState, useCallback, useMemo } from 'react'
-import type { ValidationRule } from '@/lib/validations'
-import type { ValidationError } from '@/lib/types'
+import { z } from 'zod'
 
-export interface UseValidationOptions<T extends Record<string, unknown>> {
-  rules: Partial<Record<keyof T, ValidationRule[]>>
+interface UseValidationOptions<T extends z.ZodRawShape> {
+  schema: z.ZodObject<T>
   validateOnChange?: boolean
 }
 
-export interface UseValidationReturn<T extends Record<string, unknown>> {
+interface UseValidationReturn<T extends Record<string, unknown>> {
   errors: Record<string, string>
   touched: Record<string, boolean>
   isValid: boolean
-  validateField: (field: keyof T, value: unknown) => string | null
+  validateField: (field: keyof T, value: unknown, formData: T) => string | null
   validateAll: (data: T) => boolean
   setTouched: (field: keyof T) => void
-  setAllTouched: () => void
   clearErrors: () => void
   clearField: (field: keyof T) => void
   getFieldError: (field: keyof T) => string | undefined
   isFieldValid: (field: keyof T) => boolean
 }
 
+/**
+ * Hook de validação unificado com Zod.
+ * Substitui a implementação customizada anterior.
+ */
 export function useValidation<T extends Record<string, unknown>>(
-  options: UseValidationOptions<T>
+  options: { schema: z.ZodType<T>, validateOnChange?: boolean }
 ): UseValidationReturn<T> {
-  const { rules, validateOnChange = true } = options
+  const { schema, validateOnChange = true } = options
   
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [touched, setTouchedState] = useState<Record<string, boolean>>({})
   
   const validateField = useCallback(
-    (field: keyof T, value: unknown, formData?: T): string | null => {
-      const fieldRules = rules[field]
-      if (!fieldRules) return null
+    (field: keyof T, value: unknown, formData: T): string | null => {
+      // For field-level validation, we try to parse only that field if possible, 
+      // but since Zod schemas might have cross-field dependencies (refine), 
+      // we usually parse the full object.
+      const result = schema.safeParse({ ...formData, [field]: value })
       
-      for (const rule of fieldRules) {
-        if (!rule.validate(value as string, formData as Record<string, unknown>)) {
-          if (validateOnChange) {
-            setErrors((prev) => ({ ...prev, [field]: rule.message }))
-          }
-          return rule.message
+      if (!result.success) {
+        const error = result.error.issues.find((issue) => issue.path[0] === field)
+        const message = error?.message || null
+        
+        if (validateOnChange) {
+          setErrors((prev) => {
+            if (message) {
+              return { ...prev, [field as string]: message }
+            } else {
+              const newErrors = { ...prev }
+              delete newErrors[field as string]
+              return newErrors
+            }
+          })
         }
+        return message
       }
       
       if (validateOnChange) {
@@ -55,52 +68,51 @@ export function useValidation<T extends Record<string, unknown>>(
       
       return null
     },
-    [rules, validateOnChange]
+    [schema, validateOnChange]
   )
   
   const validateAll = useCallback(
     (data: T): boolean => {
-      const newErrors: Record<string, string> = {}
+      const result = schema.safeParse(data)
       
-      for (const [field, fieldRules] of Object.entries(rules)) {
-        if (!fieldRules) continue
-        
-        const value = data[field as keyof T]
-        
-        for (const rule of fieldRules as ValidationRule[]) {
-          if (!rule.validate(value as string, data as Record<string, unknown>)) {
-            newErrors[field] = rule.message
-            break
+      if (!result.success) {
+        const newErrors: Record<string, string> = {}
+        result.error.issues.forEach((issue) => {
+          const field = issue.path[0] as string
+          if (!newErrors[field]) {
+            newErrors[field] = issue.message
           }
-        }
+        })
+        setErrors(newErrors)
+        
+        // Mark all fields from schema as touched
+        const allTouched: Record<string, boolean> = {}
+        // We can't easily iterate keys of a generic schema, but we can use the keys from the error and the data
+        Object.keys(data).forEach(key => {
+          allTouched[key] = true
+        })
+        setTouchedState(allTouched)
+        
+        return false
       }
       
-      setErrors(newErrors)
+      setErrors({})
       
-      // Mark all fields as touched
       const allTouched: Record<string, boolean> = {}
-      for (const field of Object.keys(rules)) {
-        allTouched[field] = true
-      }
+      Object.keys(data).forEach(key => {
+        allTouched[key] = true
+      })
       setTouchedState(allTouched)
       
-      return Object.keys(newErrors).length === 0
+      return true
     },
-    [rules]
+    [schema]
   )
   
   const setTouched = useCallback((field: keyof T) => {
     setTouchedState((prev) => ({ ...prev, [field]: true }))
   }, [])
-  
-  const setAllTouched = useCallback(() => {
-    const allTouched: Record<string, boolean> = {}
-    for (const field of Object.keys(rules)) {
-      allTouched[field] = true
-    }
-    setTouchedState(allTouched)
-  }, [rules])
-  
+
   const clearErrors = useCallback(() => {
     setErrors({})
     setTouchedState({})
@@ -146,7 +158,6 @@ export function useValidation<T extends Record<string, unknown>>(
     validateField,
     validateAll,
     setTouched,
-    setAllTouched,
     clearErrors,
     clearField,
     getFieldError,

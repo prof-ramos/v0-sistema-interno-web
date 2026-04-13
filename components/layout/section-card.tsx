@@ -1,15 +1,23 @@
+import { type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface SectionCardProps {
   title?: string
   description?: string
-  actions?: React.ReactNode
-  children: React.ReactNode
+  actions?: ReactNode
+  children: ReactNode
   className?: string
   contentClassName?: string
   noPadding?: boolean
 }
+
+const cardClasses = [
+  'border-border shadow-sm',
+  'transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+  'hover:shadow-md hover:-translate-y-1',
+  'motion-reduce:transform-none motion-reduce:transition-none motion-reduce:hover:shadow-sm',
+].join(' ')
 
 export function SectionCard({ 
   title, 
@@ -23,7 +31,7 @@ export function SectionCard({
   const hasHeader = title || description || actions
 
   return (
-    <Card className={cn('border-border shadow-sm', className)}>
+    <Card className={cn(cardClasses, className)}>
       {hasHeader && (
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
           <div className="space-y-1">

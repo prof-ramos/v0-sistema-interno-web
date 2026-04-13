@@ -6,7 +6,9 @@ import {
   PRIORIDADE_LABELS,
   PRIORIDADE_COLORS,
   STATUS_DOCUMENTO_LABELS,
+  DOCUMENTO_STATUS_COLORS,
   STATUS_CADASTRO_LABELS,
+  CADASTRO_STATUS_COLORS,
 } from '@/lib/constants'
 import type { StatusSolicitacao, Prioridade } from '@/lib/types'
 
@@ -20,12 +22,12 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     <Badge
       variant="secondary"
       className={cn(
-        'font-normal',
-        STATUS_SOLICITACAO_COLORS[status],
+        'font-bold uppercase tracking-widest text-xs',
+        STATUS_SOLICITACAO_COLORS[status.toUpperCase() as StatusSolicitacao],
         className
       )}
     >
-      {STATUS_SOLICITACAO_LABELS[status]}
+      {STATUS_SOLICITACAO_LABELS[status.toUpperCase() as StatusSolicitacao]}
     </Badge>
   )
 }
@@ -40,26 +42,19 @@ export function PrioridadeBadge({ prioridade, className }: PrioridadeBadgeProps)
     <Badge
       variant="secondary"
       className={cn(
-        'font-normal',
-        PRIORIDADE_COLORS[prioridade],
+        'font-bold uppercase tracking-widest text-xs',
+        PRIORIDADE_COLORS[prioridade.toUpperCase() as Prioridade],
         className
       )}
     >
-      {PRIORIDADE_LABELS[prioridade]}
+      {PRIORIDADE_LABELS[prioridade.toUpperCase() as Prioridade]}
     </Badge>
   )
 }
 
 interface DocumentoStatusBadgeProps {
-  status: 'rascunho' | 'finalizado' | 'enviado' | 'arquivado'
+  status: 'RASCUNHO' | 'FINALIZADO' | 'ENVIADO' | 'ARQUIVADO'
   className?: string
-}
-
-const DOCUMENTO_STATUS_COLORS = {
-  rascunho: 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-400',
-  finalizado: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  enviado: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  arquivado: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
 }
 
 export function DocumentoStatusBadge({ status, className }: DocumentoStatusBadgeProps) {
@@ -67,7 +62,7 @@ export function DocumentoStatusBadge({ status, className }: DocumentoStatusBadge
     <Badge
       variant="secondary"
       className={cn(
-        'font-normal',
+        'font-bold uppercase tracking-widest text-xs',
         DOCUMENTO_STATUS_COLORS[status],
         className
       )}
@@ -78,22 +73,16 @@ export function DocumentoStatusBadge({ status, className }: DocumentoStatusBadge
 }
 
 interface CadastroStatusBadgeProps {
-  status: 'ativo' | 'inativo' | 'pendente'
+  status: 'ATIVO' | 'INATIVO' | 'PENDENTE'
   className?: string
-}
-
-const CADASTRO_STATUS_COLORS = {
-  ativo: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  inativo: 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-400',
-  pendente: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
 }
 
 export function CadastroStatusBadge({ status, className }: CadastroStatusBadgeProps) {
   return (
     <Badge
-      variant="secondary"
+      variant="outline"
       className={cn(
-        'font-normal',
+        'font-bold uppercase tracking-widest text-xs transition-colors',
         CADASTRO_STATUS_COLORS[status],
         className
       )}

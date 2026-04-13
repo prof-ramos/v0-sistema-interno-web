@@ -11,11 +11,11 @@ import type {
   ConfiguracoesApp 
 } from '@/lib/types'
 import { 
-  MOCK_CADASTROS, 
-  MOCK_SOLICITACOES, 
+  DEFAULT_CONFIGURACOES,
+  MOCK_CADASTROS,
   MOCK_DOCUMENTOS,
-  DEFAULT_CONFIGURACOES 
-} from '@/lib/constants'
+  MOCK_SOLICITACOES,
+} from '@/lib/mock-data'
 
 // Gerar ID único
 function generateId(): string {
@@ -28,28 +28,22 @@ function now(): string {
 }
 
 interface AppStore extends AppState {
-  // Cadastros
-  addCadastro: (data: CadastroForm) => Cadastro
-  updateCadastro: (id: string, data: Partial<CadastroForm>) => void
-  deleteCadastro: (id: string) => void
+  // Cadastros - Somente leitura local (populado via Fetch)
+  setCadastros: (cadastros: Cadastro[]) => void
   
-  // Solicitações
+  // Solicitações (Manter local por ora conforme plano)
   addSolicitacao: (data: SolicitacaoForm) => Solicitacao
   updateSolicitacao: (id: string, data: Partial<SolicitacaoForm>) => void
   deleteSolicitacao: (id: string) => void
   
-  // Documentos
+  // Documentos (Manter local por ora conforme plano)
   addDocumento: (data: DocumentoForm) => Documento
   updateDocumento: (id: string, data: Partial<DocumentoForm>) => void
   deleteDocumento: (id: string) => void
   
   // Configurações
   updateConfiguracoes: (data: Partial<ConfiguracoesApp>) => void
-  
-  // UI
-  toggleSidebar: () => void
-  setSidebarCollapsed: (collapsed: boolean) => void
-  
+
   // Rascunhos
   saveRascunhoCadastro: (data: Partial<CadastroForm>) => void
   clearRascunhoCadastro: () => void
@@ -63,11 +57,10 @@ interface AppStore extends AppState {
 }
 
 const initialState: AppState = {
-  cadastros: MOCK_CADASTROS,
+  cadastros: [],
   solicitacoes: MOCK_SOLICITACOES,
   documentos: MOCK_DOCUMENTOS,
   configuracoes: DEFAULT_CONFIGURACOES,
-  sidebarCollapsed: false,
   rascunhos: {},
 }
 
@@ -77,32 +70,7 @@ export const useAppStore = create<AppStore>()(
       ...initialState,
       
       // ===== CADASTROS =====
-      addCadastro: (data) => {
-        const novoCadastro: Cadastro = {
-          ...data,
-          id: generateId(),
-          criadoEm: now(),
-          atualizadoEm: now(),
-        }
-        set((state) => ({
-          cadastros: [...state.cadastros, novoCadastro],
-        }))
-        return novoCadastro
-      },
-      
-      updateCadastro: (id, data) => {
-        set((state) => ({
-          cadastros: state.cadastros.map((c) =>
-            c.id === id ? { ...c, ...data, atualizadoEm: now() } : c
-          ),
-        }))
-      },
-      
-      deleteCadastro: (id) => {
-        set((state) => ({
-          cadastros: state.cadastros.filter((c) => c.id !== id),
-        }))
-      },
+      setCadastros: (cadastros) => set({ cadastros }),
       
       // ===== SOLICITAÇÕES =====
       addSolicitacao: (data) => {
@@ -175,18 +143,7 @@ export const useAppStore = create<AppStore>()(
           },
         }))
       },
-      
-      // ===== UI =====
-      toggleSidebar: () => {
-        set((state) => ({
-          sidebarCollapsed: !state.sidebarCollapsed,
-        }))
-      },
-      
-      setSidebarCollapsed: (collapsed) => {
-        set({ sidebarCollapsed: collapsed })
-      },
-      
+
       // ===== RASCUNHOS =====
       saveRascunhoCadastro: (data) => {
         set((state) => ({
@@ -230,22 +187,20 @@ export const useAppStore = create<AppStore>()(
       },
     }),
     {
-      name: 'sistema-interno-storage',
+      name: 'sistema-interno-storage-v2',
       partialize: (state) => ({
-        cadastros: state.cadastros,
+        // ⚠ PII Compliance: 
+        // 1. Cadastros removidos (persistência no backend Prisma)
+        // 2. Perfil removido (PII sensível: nome, email)
         solicitacoes: state.solicitacoes,
         documentos: state.documentos,
-        configuracoes: state.configuracoes,
+        configuracoes: {
+          ...state.configuracoes,
+          perfil: undefined, // Reset do perfil no reload para segurança até migração de API
+        },
         rascunhos: state.rascunhos,
       }),
     }
   )
 )
 
-// Seletores para uso otimizado
-export const useCadastros = () => useAppStore((state) => state.cadastros)
-export const useSolicitacoes = () => useAppStore((state) => state.solicitacoes)
-export const useDocumentos = () => useAppStore((state) => state.documentos)
-export const useConfiguracoes = () => useAppStore((state) => state.configuracoes)
-export const useSidebarCollapsed = () => useAppStore((state) => state.sidebarCollapsed)
-export const useRascunhos = () => useAppStore((state) => state.rascunhos)

@@ -27,7 +27,15 @@ interface DataTableProps<T> {
 
 type SortDirection = 'asc' | 'desc' | null
 
-export function DataTable<T>({
+function getColumnValue<T extends object>(item: T, key: keyof T | string): unknown {
+  if (typeof key !== 'string' || !(key in item)) {
+    return undefined
+  }
+
+  return item[key as keyof T]
+}
+
+export function DataTable<T extends object>({
   data,
   columns,
   keyExtractor,
@@ -55,23 +63,36 @@ export function DataTable<T>({
 
   const sortedData = useMemo(() => {
     if (!sortKey || !sortDirection) return data
+    const sortColumn = columns.find((item) => String(item.key) === sortKey)
 
     return [...data].sort((a, b) => {
-      const aValue = (a as Record<string, unknown>)[sortKey]
-      const bValue = (b as Record<string, unknown>)[sortKey]
+      const aValue = sortColumn?.sortableValue ? sortColumn.sortableValue(a) : getColumnValue(a, sortKey)
+      const bValue = sortColumn?.sortableValue ? sortColumn.sortableValue(b) : getColumnValue(b, sortKey)
 
       if (aValue === bValue) return 0
       if (aValue === null || aValue === undefined) return 1
       if (bValue === null || bValue === undefined) return -1
 
-      const comparison = String(aValue).localeCompare(String(bValue), 'pt-BR', {
-        numeric: true,
-        sensitivity: 'base',
-      })
+      let comparison: number
+      if (aValue instanceof Date && bValue instanceof Date) {
+        comparison = aValue.getTime() - bValue.getTime()
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+        const aFinite = Number.isFinite(aValue)
+        const bFinite = Number.isFinite(bValue)
+        if (!aFinite && !bFinite) comparison = 0
+        else if (!aFinite) comparison = 1
+        else if (!bFinite) comparison = -1
+        else comparison = aValue - bValue
+      } else {
+        comparison = String(aValue).localeCompare(String(bValue), 'pt-BR', {
+          numeric: true,
+          sensitivity: 'base',
+        })
+      }
 
       return sortDirection === 'asc' ? comparison : -comparison
     })
-  }, [data, sortKey, sortDirection])
+  }, [columns, data, sortKey, sortDirection])
 
   const getSortIcon = (key: string) => {
     if (sortKey !== key) {
@@ -161,7 +182,7 @@ export function DataTable<T>({
                 <TableCell key={String(column.key)}>
                   {column.render
                     ? column.render(item)
-                    : String((item as Record<string, unknown>)[column.key as string] ?? '-')}
+                    : String(getColumnValue(item, column.key) ?? '-')}
                 </TableCell>
               ))}
             </TableRow>

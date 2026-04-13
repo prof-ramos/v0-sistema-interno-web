@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { useTheme } from 'next-themes'
 import { Save, User, Palette, Bell, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/store/use-app-store'
 import { useAutoSave } from '@/hooks/use-debounce'
+import { isDeepEqual } from '@/lib/utils'
 import type { ConfiguracoesApp } from '@/lib/types'
 
 export default function ConfiguracoesPage() {
@@ -23,6 +24,12 @@ export default function ConfiguracoesPage() {
   
   const [perfil, setPerfil] = useState(configuracoes.perfil)
   const [notificacoes, setNotificacoes] = useState(configuracoes.notificacoes)
+
+  const isPerfilDirty = useMemo(() => !isDeepEqual(perfil, configuracoes.perfil), [perfil, configuracoes.perfil])
+  const isNotificacoesDirty = useMemo(
+    () => !isDeepEqual(notificacoes, configuracoes.notificacoes),
+    [notificacoes, configuracoes.notificacoes]
+  )
 
   // Hydration fix for theme
   useEffect(() => {
@@ -42,7 +49,7 @@ export default function ConfiguracoesPage() {
       updateConfiguracoes({ perfil: data })
     },
     1000,
-    JSON.stringify(perfil) !== JSON.stringify(configuracoes.perfil)
+    isPerfilDirty
   )
 
   // Auto-save notifications
@@ -52,7 +59,7 @@ export default function ConfiguracoesPage() {
       updateConfiguracoes({ notificacoes: data })
     },
     500,
-    JSON.stringify(notificacoes) !== JSON.stringify(configuracoes.notificacoes)
+    isNotificacoesDirty
   )
 
   const handlePerfilChange = useCallback((field: keyof typeof perfil, value: string) => {
@@ -81,7 +88,7 @@ export default function ConfiguracoesPage() {
       notificacoes,
       tema: theme as ConfiguracoesApp['tema'],
     })
-    toast.success('Configuracoes salvas com sucesso!')
+    toast.success('Configurações salvas com sucesso!')
   }, [perfil, notificacoes, theme, updateConfiguracoes])
 
   return (
@@ -291,4 +298,3 @@ export default function ConfiguracoesPage() {
     </div>
   )
 }
-

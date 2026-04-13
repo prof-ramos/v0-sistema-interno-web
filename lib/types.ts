@@ -12,7 +12,7 @@ export interface Cadastro extends BaseEntity {
   // Dados Principais
   nome: string
   cpfCnpj: string
-  tipo: 'pessoa_fisica' | 'pessoa_juridica'
+  tipo: 'FISICA' | 'JURIDICA'
   
   // Contato
   email: string
@@ -31,15 +31,15 @@ export interface Cadastro extends BaseEntity {
   observacoes?: string
   
   // Status
-  status: 'ativo' | 'inativo' | 'pendente'
+  status: 'ATIVO' | 'INATIVO' | 'PENDENTE'
 }
 
 export type CadastroForm = Omit<Cadastro, 'id' | 'criadoEm' | 'atualizadoEm'>
 
 // ===== SOLICITAÇÃO =====
 
-export type StatusSolicitacao = 'pendente' | 'em_analise' | 'aprovada' | 'rejeitada' | 'concluida'
-export type Prioridade = 'baixa' | 'media' | 'alta' | 'urgente'
+export type StatusSolicitacao = 'PENDENTE' | 'EM_ANALISE' | 'APROVADA' | 'REJEITADA' | 'CONCLUIDA'
+export type Prioridade = 'BAIXA' | 'MEDIA' | 'ALTA' | 'URGENTE'
 
 export interface Solicitacao extends BaseEntity {
   titulo: string
@@ -59,7 +59,7 @@ export type SolicitacaoForm = Omit<Solicitacao, 'id' | 'criadoEm' | 'atualizadoE
 
 // ===== DOCUMENTO =====
 
-export type TipoDocumento = 'oficio' | 'memorando' | 'portaria' | 'decreto' | 'contrato' | 'outro'
+export type TipoDocumento = 'OFICIO' | 'MEMORANDO' | 'PORTARIA' | 'DECRETO' | 'CONTRATO' | 'OUTRO'
 
 export interface Documento extends BaseEntity {
   numero: string
@@ -70,7 +70,7 @@ export interface Documento extends BaseEntity {
   remetente: string
   assunto: string
   dataDocumento: string
-  status: 'rascunho' | 'finalizado' | 'enviado' | 'arquivado'
+  status: 'RASCUNHO' | 'FINALIZADO' | 'ENVIADO' | 'ARQUIVADO'
   anexos?: string[]
 }
 
@@ -103,10 +103,7 @@ export interface AppState {
   solicitacoes: Solicitacao[]
   documentos: Documento[]
   configuracoes: ConfiguracoesApp
-  
-  // UI State
-  sidebarCollapsed: boolean
-  
+
   // Rascunhos (para auto-save)
   rascunhos: {
     cadastro?: Partial<CadastroForm>
@@ -115,24 +112,13 @@ export interface AppState {
   }
 }
 
-// ===== VALIDAÇÃO =====
-
-export interface ValidationError {
-  field: string
-  message: string
-}
-
-export interface ValidationResult {
-  isValid: boolean
-  errors: ValidationError[]
-}
-
 // ===== TABELA =====
 
 export interface Column<T> {
   key: keyof T | string
   header: string
   render?: (item: T) => React.ReactNode
+  sortableValue?: (item: T) => string | number | Date | null | undefined
   sortable?: boolean
   width?: string
 }

@@ -112,7 +112,7 @@ export default function SolicitacoesPage() {
       sortable: true,
       render: (item) => (
         <div className="min-w-0">
-          <p className="truncate font-medium">{item.titulo}</p>
+          <p className="truncate font-serif font-bold">{item.titulo}</p>
           <p className="truncate text-xs text-muted-foreground">{item.tipo}</p>
         </div>
       ),
@@ -152,6 +152,7 @@ export default function SolicitacoesPage() {
             variant="ghost"
             size="icon"
             className="size-8"
+            aria-label={`Visualizar solicitação: ${item.titulo}`}
             onClick={(e) => {
               e.stopPropagation()
               handleView(item)
@@ -163,6 +164,7 @@ export default function SolicitacoesPage() {
             variant="ghost"
             size="icon"
             className="size-8 text-muted-foreground hover:text-destructive"
+            aria-label={`Excluir solicitação: ${item.titulo}`}
             onClick={(e) => {
               e.stopPropagation()
               handleDelete(item.id)
@@ -176,7 +178,7 @@ export default function SolicitacoesPage() {
   ], [handleView, handleDelete])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <PageHeader
         title="Solicitações"
         subtitle="Gerencie solicitações e demandas"

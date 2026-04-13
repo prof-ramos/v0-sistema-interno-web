@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
-import { Plus, Save, Trash2, Sparkles, User } from 'lucide-react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import { Plus, Sparkles, User, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader, SectionCard } from '@/components/layout'
 import { FormField, FormSection, ActionButtons } from '@/components/forms'
@@ -13,14 +13,15 @@ import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/store/use-app-store'
 import { useValidation } from '@/hooks/use-validation'
 import { useAutoSave } from '@/hooks/use-debounce'
-import { cadastroValidationRules, maskCPFOrCNPJ, maskPhone, maskCEP } from '@/lib/validations'
+import { isDeepEqual } from '@/lib/utils'
+import { cadastroSchema, maskCPFOrCNPJ, maskPhone, maskCEP } from '@/lib/validations'
 import { UF_OPTIONS } from '@/lib/constants'
 import type { CadastroForm, Cadastro } from '@/lib/types'
 
 const initialFormData: CadastroForm = {
   nome: '',
   cpfCnpj: '',
-  tipo: 'pessoa_fisica',
+  tipo: 'FISICA',
   email: '',
   telefone: '',
   cep: '',
@@ -31,36 +32,62 @@ const initialFormData: CadastroForm = {
   cidade: '',
   uf: '',
   observacoes: '',
-  status: 'ativo',
+  status: 'ATIVO',
 }
 
 export default function CadastroPage() {
   const { 
-    cadastros, 
-    addCadastro, 
-    updateCadastro, 
-    deleteCadastro,
     rascunhos,
     saveRascunhoCadastro,
     clearRascunhoCadastro,
   } = useAppStore()
 
+  const [localCadastros, setLocalCadastros] = useState<Cadastro[]>([])
   const [formData, setFormData] = useState<CadastroForm>(initialFormData)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState<string | null>(null)
 
-  const { errors, touched, validateField, validateAll, setTouched, clearErrors, getFieldError } = useValidation({
-    rules: cadastroValidationRules,
-  })
-
-  // Load draft on mount
-  useEffect(() => {
-    if (rascunhos.cadastro && !selectedId) {
-      setFormData({ ...initialFormData, ...rascunhos.cadastro })
+  const fetchCadastros = useCallback(async (signal?: AbortSignal) => {
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/cadastros', { signal })
+      if (!response.ok) throw new Error('Erro ao carregar cadastros')
+      const result = await response.json()
+      setLocalCadastros(Array.isArray(result) ? result : result.data || [])
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return
+      toast.error('Não foi possível carregar a lista de cadastros.')
+    } finally {
+      setIsLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchCadastros(controller.signal)
+    return () => controller.abort()
+  }, [fetchCadastros])
+
+  const { touched, validateField, validateAll, setTouched, clearErrors, getFieldError } = useValidation({
+    schema: cadastroSchema,
+  })
+
+  // Load draft on mount (once only)
+  const hydratedRef = useRef(false)
+  useEffect(() => {
+    if (rascunhos.cadastro && !selectedId && !hydratedRef.current) {
+      setFormData((prev) => ({ ...prev, ...rascunhos.cadastro }))
+      hydratedRef.current = true
+    }
+  }, [rascunhos.cadastro, selectedId])
+
+  const hasUnsavedDraftChanges = useMemo(
+    () => !isDeepEqual(formData, initialFormData) && !isDeepEqual(formData, rascunhos.cadastro),
+    [formData, rascunhos.cadastro]
+  )
 
   // Auto-save draft
   useAutoSave(
@@ -71,19 +98,20 @@ export default function CadastroPage() {
       }
     },
     1500,
-    !selectedId && JSON.stringify(formData) !== JSON.stringify(initialFormData)
+    !selectedId && hasUnsavedDraftChanges
   )
 
   const handleFieldChange = useCallback((field: keyof CadastroForm, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    const nextData = { ...formData, [field]: value }
+    setFormData(nextData)
     if (touched[field]) {
-      validateField(field, value)
+      validateField(field, value, nextData)
     }
-  }, [touched, validateField])
+  }, [formData, touched, validateField])
 
   const handleFieldBlur = useCallback((field: keyof CadastroForm) => {
     setTouched(field)
-    validateField(field, formData[field])
+    validateField(field, formData[field], formData)
   }, [formData, setTouched, validateField])
 
   const handleSelectCadastro = useCallback((cadastro: Cadastro) => {
@@ -111,56 +139,75 @@ export default function CadastroPage() {
     setSelectedId(null)
     setFormData(initialFormData)
     clearErrors()
+    hydratedRef.current = false
   }, [clearErrors])
 
   const handleSubmit = useCallback(async () => {
     if (!validateAll(formData)) {
-      toast.error('Por favor, corrija os erros no formulario.')
+      toast.error('Por favor, corrija os erros no formulário.')
       return
     }
 
     setIsSubmitting(true)
     
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500))
+      const url = selectedId ? `/api/cadastros/${selectedId}` : '/api/cadastros'
+      const method = selectedId ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
 
-      if (selectedId) {
-        updateCadastro(selectedId, formData)
-        toast.success('Cadastro atualizado com sucesso!')
-      } else {
-        addCadastro(formData)
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erro ao salvar cadastro')
+      }
+
+      toast.success(selectedId ? 'Cadastro atualizado com sucesso!' : 'Cadastro criado com sucesso!')
+      
+      if (!selectedId) {
         clearRascunhoCadastro()
-        toast.success('Cadastro criado com sucesso!')
       }
       
       handleNewCadastro()
+      fetchCadastros()
     } catch (error) {
-      toast.error('Erro ao salvar cadastro. Tente novamente.')
+      toast.error(error instanceof Error ? error.message : 'Erro ao salvar cadastro. Tente novamente.')
     } finally {
       setIsSubmitting(false)
     }
-  }, [formData, selectedId, validateAll, updateCadastro, addCadastro, clearRascunhoCadastro, handleNewCadastro])
+  }, [formData, selectedId, validateAll, clearRascunhoCadastro, handleNewCadastro, fetchCadastros])
 
   const handleDelete = useCallback((id: string) => {
     setItemToDelete(id)
     setDeleteDialogOpen(true)
   }, [])
 
-  const confirmDelete = useCallback(() => {
+  const confirmDelete = useCallback(async () => {
     if (itemToDelete) {
-      deleteCadastro(itemToDelete)
-      toast.success('Cadastro excluído com sucesso!')
-      if (selectedId === itemToDelete) {
-        handleNewCadastro()
+      try {
+        const response = await fetch(`/api/cadastros/${itemToDelete}`, { method: 'DELETE' })
+        if (!response.ok) throw new Error('Erro ao excluir')
+        
+        toast.success('Cadastro excluído com sucesso!')
+        if (selectedId === itemToDelete) {
+          handleNewCadastro()
+        }
+        fetchCadastros()
+      } catch (error) {
+        toast.error('Erro ao excluir cadastro.')
+      } finally {
+        setDeleteDialogOpen(false)
+        setItemToDelete(null)
       }
-      setItemToDelete(null)
     }
-  }, [itemToDelete, deleteCadastro, selectedId, handleNewCadastro])
+  }, [itemToDelete, selectedId, handleNewCadastro, fetchCadastros])
 
   const handleGenerateAI = useCallback(() => {
     toast.info('Funcionalidade de IA em desenvolvimento...', {
-      description: 'Em breve voce podera gerar dados automaticamente.',
+      description: 'Em breve você poderá gerar dados automaticamente.',
     })
   }, [])
 
@@ -183,11 +230,11 @@ export default function CadastroPage() {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-8 lg:grid-cols-3">
         {/* Form */}
         <div className="lg:col-span-2 space-y-6">
           <SectionCard title="Dados do Cadastro">
-            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
+            <form noValidate onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
               {/* Dados Principais */}
               <FormSection title="Dados Principais" description="Informações básicas do cadastro">
                 <FormField
@@ -219,10 +266,10 @@ export default function CadastroPage() {
                   label="Tipo"
                   name="tipo"
                   value={formData.tipo}
-                  onChange={(v) => handleFieldChange('tipo', v as 'pessoa_fisica' | 'pessoa_juridica')}
+                  onChange={(v) => handleFieldChange('tipo', v)}
                   options={[
-                    { value: 'pessoa_fisica', label: 'Pessoa Fisica' },
-                    { value: 'pessoa_juridica', label: 'Pessoa Juridica' },
+                    { value: 'FISICA', label: 'Pessoa Física' },
+                    { value: 'JURIDICA', label: 'Pessoa Jurídica' },
                   ]}
                 />
               </FormSection>
@@ -230,7 +277,7 @@ export default function CadastroPage() {
               <Separator />
 
               {/* Contato */}
-              <FormSection title="Contato" description="Informacoes de contato">
+              <FormSection title="Contato" description="Informações de contato">
                 <FormField
                   type="email"
                   label="E-mail"
@@ -258,7 +305,7 @@ export default function CadastroPage() {
 
               <Separator />
 
-              {/* Endereco */}
+              {/* Endereço */}
               <FormSection title="Endereço" description="Informações de localização">
                 <FormField
                   type="text"
@@ -285,7 +332,7 @@ export default function CadastroPage() {
                 />
                 <FormField
                   type="text"
-                  label="Numero"
+                  label="Número"
                   name="numero"
                   value={formData.numero}
                   onChange={(v) => handleFieldChange('numero', v)}
@@ -341,18 +388,18 @@ export default function CadastroPage() {
                   label="Status"
                   name="status"
                   value={formData.status}
-                  onChange={(v) => handleFieldChange('status', v as 'ativo' | 'inativo' | 'pendente')}
+                  onChange={(v) => handleFieldChange('status', v)}
                   options={[
-                    { value: 'ativo', label: 'Ativo' },
-                    { value: 'inativo', label: 'Inativo' },
-                    { value: 'pendente', label: 'Pendente' },
+                    { value: 'ATIVO', label: 'Ativo' },
+                    { value: 'INATIVO', label: 'Inativo' },
+                    { value: 'PENDENTE', label: 'Pendente' },
                   ]}
                 />
               </FormSection>
 
               <Separator />
 
-              {/* Observacoes */}
+              {/* Observações */}
               <FormSection title="Observações" description="Informações adicionais">
                 <FormField
                   type="textarea"
@@ -381,10 +428,14 @@ export default function CadastroPage() {
         <div>
           <SectionCard 
             title="Cadastros Salvos" 
-            description={`${cadastros.length} registros`}
+            description={`${localCadastros.length} registros`}
             contentClassName="p-0"
           >
-            {cadastros.length === 0 ? (
+            {isLoading ? (
+              <div className="p-8 flex justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : localCadastros.length === 0 ? (
               <div className="p-4">
                 <EmptyState
                   icon={User}
@@ -395,7 +446,7 @@ export default function CadastroPage() {
             ) : (
               <ScrollArea className="h-[500px]">
                 <div className="divide-y">
-                  {cadastros.map((cadastro) => (
+                  {localCadastros.map((cadastro) => (
                     <div
                       key={cadastro.id}
                       className={`flex items-center justify-between p-3 cursor-pointer transition-colors hover:bg-accent/50 ${
@@ -413,7 +464,8 @@ export default function CadastroPage() {
                           variant="ghost"
                           size="icon"
                           className="size-8 text-muted-foreground hover:text-destructive"
-                          onClick={(e) => {
+                          aria-label={`Excluir cadastro de ${cadastro.nome}`}
+                          onClick={(e: React.MouseEvent) => {
                             e.stopPropagation()
                             handleDelete(cadastro.id)
                           }}
@@ -442,4 +494,3 @@ export default function CadastroPage() {
     </div>
   )
 }
-
